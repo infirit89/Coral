@@ -150,11 +150,36 @@ public static class ArrayStorage
 		{
 			var arrayObject = InValue as Array;
 			arrayHandle = GCHandle.Alloc(arrayObject, GCHandleType.Pinned);
+
+			if(InTarget != null)
+				AssemblyLoader.RegisterHandle(InTarget.GetType().Assembly, arrayHandle);
+
 			s_FieldArrays.Add(arrayId, arrayHandle);
 		}
 
 		return arrayHandle;
 	}
+
+	public static void FreeFieldArrayIfExists(object? InTarget, MemberInfo? InArrayMemberInfo) 
+	{
+		if (InArrayMemberInfo == null)
+			return;
+
+		int arrayId = InArrayMemberInfo.GetHashCode();
+		arrayId += InTarget != null ? InTarget.GetHashCode() : 0;
+		if (s_FieldArrays.TryGetValue(arrayId, out var handle)) 
+		{
+			try
+			{
+				handle.Free();
+			}
+			catch (InvalidOperationException ex) 
+			{
+				ManagedHost.HandleException(ex);
+			}
+			s_FieldArrays.Remove(arrayId);
+		}
+    }
 }
 
 [StructLayout(LayoutKind.Sequential)]

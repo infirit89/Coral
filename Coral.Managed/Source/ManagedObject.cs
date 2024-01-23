@@ -155,7 +155,18 @@ internal static class ManagedObject
 	{
 		try
 		{
-			GCHandle.FromIntPtr(InObjectHandle).Free();
+			GCHandle handle = GCHandle.FromIntPtr(InObjectHandle);
+			object? target = handle.Target;
+            if (target is null)
+				goto CommonFree;
+
+			FieldInfo[] fieldInfo = target.GetType().GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+			foreach (var field in fieldInfo)
+				ArrayStorage.FreeFieldArrayIfExists(target, field);
+
+			CommonFree:
+			handle.Free();
+			Console.WriteLine("free");
 		}
 		catch (Exception ex)
 		{

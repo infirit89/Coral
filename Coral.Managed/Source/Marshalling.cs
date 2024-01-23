@@ -3,6 +3,7 @@
 using System;
 using System.Linq;
 using System.Reflection;
+using System.Reflection.Metadata.Ecma335;
 using System.Runtime.InteropServices;
 
 namespace Coral.Managed;
@@ -21,7 +22,6 @@ public static class Marshalling
 			return;
 
 		Type? type = null;
-
 		if (InMemberInfo is FieldInfo fieldInfo)
 		{
 			type = fieldInfo.FieldType;
@@ -35,13 +35,30 @@ public static class Marshalling
 			type = methodInfo.ReturnType;
 		}
 
+		if (type == null)
+			return;
+
 		if (type.IsSZArray)
 		{
 			var fieldArray = ArrayStorage.GetFieldArray(InTarget, InValue, InMemberInfo);
 
 			if (fieldArray != null)
 			{
-				Marshal.WriteIntPtr(OutValue, fieldArray.Value.AddrOfPinnedObject());
+				// NOTE: there most likely exists a better way to do this
+				// for now should do the trick
+				ArrayContainer container = new() 
+				{
+					Data = fieldArray.Value.AddrOfPinnedObject(),
+					Length = (fieldArray.Value.Target as Array).Length
+				};
+
+				var handle = GCHandle.Alloc(container, GCHandleType.Pinned);
+				//Marshal.WriteIntPtr(OutValue, fieldArray.Value.AddrOfPinnedObject());
+				unsafe 
+				{
+					Buffer.MemoryCopy(handle.AddrOfPinnedObject().ToPointer(), OutValue.ToPointer(), Marshal.SizeOf<ArrayContainer>(), Marshal.SizeOf<ArrayContainer>());
+				}
+				handle.Free();
 			}
 			else
 			{
@@ -99,6 +116,7 @@ public static class Marshalling
 
 		var arrayContainer = MarshalPointer<ArrayContainer>(InArray);
 
+		// this if never succeeds????
 		if (ArrayStorage.HasFieldArray(null, null))
 		{
 			var fieldArray = ArrayStorage.GetFieldArray(null, null, null);
