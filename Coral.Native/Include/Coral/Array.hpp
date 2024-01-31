@@ -47,7 +47,7 @@ namespace Coral {
 			return result;
 		}
 
-		static void Free(Array InArray)
+		static void Free(Array& InArray)
 		{
 			if (!InArray.m_Ptr || InArray.m_Length == 0)
 				return;
