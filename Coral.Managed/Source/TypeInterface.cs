@@ -52,6 +52,7 @@ internal static class TypeInterface
 		{ typeof(float), ManagedType.Float },
 		{ typeof(double), ManagedType.Double },
 		{ typeof(bool), ManagedType.Bool },
+		{ typeof(char), ManagedType.Char },
 		{ typeof(Bool32), ManagedType.Bool },
 	};
 

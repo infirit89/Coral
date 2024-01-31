@@ -29,6 +29,8 @@ internal enum ManagedType
 
 	Bool,
 
+	Char,
+
 	Pointer
 };
 
@@ -219,7 +221,8 @@ internal static class ManagedObject
 			var methodInfo = TryGetMethodInfo(type, InMethodName, InParameterTypes, InParameterCount, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
 			var parameters = Marshalling.MarshalParameterArray(InParameters, InParameterCount, methodInfo);
 
-			methodInfo.Invoke(null, parameters);
+			if(methodInfo != null)
+				methodInfo.Invoke(null, parameters);
 		}
 		catch (Exception ex)
 		{
