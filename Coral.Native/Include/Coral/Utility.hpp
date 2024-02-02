@@ -6,7 +6,7 @@ namespace Coral {
 
 	enum class ManagedType
 	{
-		Unknown,
+		Unknown = 0,
 
 		SByte,
 		Byte,
