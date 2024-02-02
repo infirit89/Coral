@@ -53,6 +53,7 @@ internal static class TypeInterface
 		{ typeof(double), ManagedType.Double },
 		{ typeof(bool), ManagedType.Bool },
 		{ typeof(Bool32), ManagedType.Bool },
+		{ typeof(char), ManagedType.Char }
 	};
 
 	internal static unsafe T? FindSuitableMethod<T>(string? InMethodName, ManagedType* InParameterTypes, int InParameterCount, ReadOnlySpan<T> InMethods) where T : MethodBase
@@ -175,7 +176,7 @@ internal static class TypeInterface
 			if (!s_CachedTypes.TryGetValue(InType, out var type))
 				return NativeString.Null();
 
-			return type.FullName;
+			return type!.FullName;
 		}
 		catch (Exception e)
 		{
@@ -192,12 +193,46 @@ internal static class TypeInterface
 			if (!s_CachedTypes.TryGetValue(InType, out var type))
 				return NativeString.Null();
 
-			return type.AssemblyQualifiedName;
+			return type!.AssemblyQualifiedName;
 		}
 		catch (Exception e)
 		{
 			HandleException(e);
 			return NativeString.Null();
+		}
+	}
+
+	[UnmanagedCallersOnly]
+	internal static unsafe int GetTypeMethod(int InType, NativeString InMethodName, ManagedType* InParameterTypes, int InParameterCount)
+	{
+		try
+		{
+			if (!s_CachedTypes.TryGetValue(InType, out var type)) 
+			{
+                LogMessage($"Cannot find method {InMethodName} on a null type.", MessageLevel.Error);
+                return -1;
+			}
+
+			MethodInfo? method = null;
+			const BindingFlags bindingAttributes = BindingFlags.Public | 
+												   BindingFlags.NonPublic |
+												   BindingFlags.Instance |
+												   BindingFlags.Static;
+
+			if (InParameterCount == 0)
+				method = type!.GetMethod(InMethodName!, bindingAttributes);
+			else
+				method = ManagedObject.TryGetMethodInfo(type!, InMethodName!, InParameterTypes, InParameterCount, bindingAttributes);
+
+			if (method == null)
+				return -1;
+
+			return s_CachedMethods.Add(method);
+		}
+		catch (Exception e) 
+		{
+			HandleException(e);
+			return -1;
 		}
 	}
 
@@ -209,7 +244,7 @@ internal static class TypeInterface
 			if (!s_CachedTypes.TryGetValue(InType, out var type) || OutBaseType == null)
 				return;
 
-			if (type.BaseType == null)
+			if (type!.BaseType == null)
 			{
 				*OutBaseType = 0;
 				return;
@@ -231,7 +266,7 @@ internal static class TypeInterface
 			if (!s_CachedTypes.TryGetValue(InType, out var type))
 				return -1;
 
-			return Marshal.SizeOf(type);
+			return Marshal.SizeOf(type!);
 		}
 		catch (Exception e)
 		{
@@ -248,7 +283,7 @@ internal static class TypeInterface
 			if (!s_CachedTypes.TryGetValue(InType0, out var type0) || !s_CachedTypes.TryGetValue(InType1, out var type1))
 				return false;
 
-			return type0.IsSubclassOf(type1);
+			return type0!.IsSubclassOf(type1!);
 		}
 		catch (Exception e)
 		{
@@ -265,7 +300,7 @@ internal static class TypeInterface
 			if (!s_CachedTypes.TryGetValue(InType0, out var type0) || !s_CachedTypes.TryGetValue(InType1, out var type1))
 				return false;
 
-			return type0.IsAssignableTo(type1);
+			return type0!.IsAssignableTo(type1);
 		}
 		catch (Exception e)
 		{
@@ -282,7 +317,7 @@ internal static class TypeInterface
 			if (!s_CachedTypes.TryGetValue(InType0, out var type0) || !s_CachedTypes.TryGetValue(InType1, out var type1))
 				return false;
 
-			return type0.IsAssignableFrom(type1);
+			return type0!.IsAssignableFrom(type1);
 		}
 		catch (Exception e)
 		{
@@ -321,7 +356,7 @@ internal static class TypeInterface
 			if (!s_CachedTypes.TryGetValue(InTypeID, out var type))
 				return;
 
-			var elementType = type.GetElementType();
+			var elementType = type!.GetElementType();
 
 			if (elementType == null)
 				*OutElementTypeID = 0;
@@ -342,7 +377,7 @@ internal static class TypeInterface
 			if (!s_CachedTypes.TryGetValue(InType, out var type))
 				return;
 
-			ReadOnlySpan<MethodInfo> methods = type.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static);
+			ReadOnlySpan<MethodInfo> methods = type!.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static);
 
 			if (methods == null || methods.Length == 0)
 			{
@@ -374,7 +409,7 @@ internal static class TypeInterface
 			if (!s_CachedTypes.TryGetValue(InType, out var type))
 				return;
 
-			ReadOnlySpan<FieldInfo> fields = type.GetFields(BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public);
+			ReadOnlySpan<FieldInfo> fields = type!.GetFields(BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public);
 
 			if (fields == null || fields.Length == 0)
 			{
@@ -406,7 +441,7 @@ internal static class TypeInterface
 			if (!s_CachedTypes.TryGetValue(InType, out var type))
 				return;
 
-			ReadOnlySpan<PropertyInfo> properties = type.GetProperties(BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public);
+			ReadOnlySpan<PropertyInfo> properties = type!.GetProperties(BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public);
 
 			if (properties == null || properties.Length == 0)
 			{
@@ -438,7 +473,7 @@ internal static class TypeInterface
 			if (!s_CachedTypes.TryGetValue(InType, out var type) || !s_CachedTypes.TryGetValue(InAttributeType, out var attributeType))
 				return false;
 
-			return type.GetCustomAttribute(attributeType) != null;
+			return type!.GetCustomAttribute(attributeType!) != null;
 		}
 		catch (Exception ex)
 		{
@@ -455,7 +490,7 @@ internal static class TypeInterface
 			if (!s_CachedTypes.TryGetValue(InType, out var type))
 				return;
 
-			var attributes = type.GetCustomAttributes().ToImmutableArray();
+			var attributes = type!.GetCustomAttributes().ToImmutableArray();
 
 			if (attributes.Length == 0)
 			{
@@ -488,7 +523,7 @@ internal static class TypeInterface
 			if (!s_CachedTypes.TryGetValue(InType, out var type))
 				return ManagedType.Unknown;
 
-			if (!s_TypeConverters.TryGetValue(type, out var managedType))
+			if (!s_TypeConverters.TryGetValue(type!, out var managedType))
 				managedType = ManagedType.Unknown;
 
 			return managedType;
@@ -509,7 +544,7 @@ internal static class TypeInterface
 			if (!s_CachedMethods.TryGetValue(InMethodInfo, out var methodInfo))
 				return NativeString.Null();
 
-			return methodInfo.Name;
+			return methodInfo!.Name;
 		}
 		catch (Exception ex)
 		{
@@ -526,7 +561,7 @@ internal static class TypeInterface
 			if (!s_CachedMethods.TryGetValue(InMethodInfo, out var methodInfo) || OutReturnType == null)
 				return;
 
-			*OutReturnType = s_CachedTypes.Add(methodInfo.ReturnType);
+			*OutReturnType = s_CachedTypes.Add(methodInfo!.ReturnType);
 		}
 		catch (Exception ex)
 		{
@@ -542,7 +577,7 @@ internal static class TypeInterface
 			if (!s_CachedMethods.TryGetValue(InMethodInfo, out var methodInfo))
 				return;
 
-			ReadOnlySpan<ParameterInfo> parameters = methodInfo.GetParameters();
+			ReadOnlySpan<ParameterInfo> parameters = methodInfo!.GetParameters();
 
 			if (parameters == null || parameters.Length == 0)
 			{
@@ -574,7 +609,7 @@ internal static class TypeInterface
 			if (!s_CachedMethods.TryGetValue(InMethodInfo, out var methodInfo))
 				return;
 
-			var attributes = methodInfo.GetCustomAttributes().ToImmutableArray();
+			var attributes = methodInfo!.GetCustomAttributes().ToImmutableArray();
 
 			if (attributes.Length == 0)
 			{
@@ -638,7 +673,7 @@ internal static class TypeInterface
 			if (!s_CachedMethods.TryGetValue(InMethodInfo, out var methodInfo))
 				return TypeAccessibility.Internal;
 
-			return GetTypeAccessibility(methodInfo);
+			return GetTypeAccessibility(methodInfo!);
 		}
 		catch (Exception ex)
 		{
@@ -655,7 +690,7 @@ internal static class TypeInterface
 			if (!s_CachedFields.TryGetValue(InFieldInfo, out var fieldInfo))
 				return NativeString.Null();
 
-			return fieldInfo.Name;
+			return fieldInfo!.Name;
 		}
 		catch (Exception ex)
 		{
@@ -672,7 +707,7 @@ internal static class TypeInterface
 			if (!s_CachedFields.TryGetValue(InFieldInfo, out var fieldInfo))
 				return;
 
-			*OutFieldType = s_CachedTypes.Add(fieldInfo.FieldType);
+			*OutFieldType = s_CachedTypes.Add(fieldInfo!.FieldType);
 		}
 		catch (Exception ex)
 		{
@@ -688,7 +723,7 @@ internal static class TypeInterface
 			if (!s_CachedFields.TryGetValue(InFieldInfo, out var fieldInfo))
 				return TypeAccessibility.Public;
 
-			return GetTypeAccessibility(fieldInfo);
+			return GetTypeAccessibility(fieldInfo!);
 		}
 		catch (Exception ex)
 		{
@@ -705,7 +740,7 @@ internal static class TypeInterface
 			if (!s_CachedFields.TryGetValue(InFieldInfo, out var fieldInfo))
 				return;
 
-			var attributes = fieldInfo.GetCustomAttributes().ToImmutableArray();
+			var attributes = fieldInfo!.GetCustomAttributes().ToImmutableArray();
 
 			if (attributes.Length == 0)
 			{
@@ -737,7 +772,7 @@ internal static class TypeInterface
 			if (!s_CachedProperties.TryGetValue(InPropertyInfo, out var propertyInfo))
 				return NativeString.Null();
 
-			return propertyInfo.Name;
+			return propertyInfo!.Name;
 		}
 		catch (Exception ex)
 		{
@@ -754,7 +789,7 @@ internal static class TypeInterface
 			if (!s_CachedProperties.TryGetValue(InPropertyInfo, out var propertyInfo))
 				return;
 
-			*OutPropertyType = s_CachedTypes.Add(propertyInfo.PropertyType);
+			*OutPropertyType = s_CachedTypes.Add(propertyInfo!.PropertyType);
 		}
 		catch (Exception ex)
 		{
@@ -770,7 +805,7 @@ internal static class TypeInterface
 			if (!s_CachedProperties.TryGetValue(InPropertyInfo, out var propertyInfo))
 				return;
 
-			var attributes = propertyInfo.GetCustomAttributes().ToImmutableArray();
+			var attributes = propertyInfo!.GetCustomAttributes().ToImmutableArray();
 
 			if (attributes.Length == 0)
 			{
@@ -802,7 +837,7 @@ internal static class TypeInterface
 			if (!s_CachedAttributes.TryGetValue(InAttribute, out var attribute))
 				return;
 
-			var targetType = attribute.GetType();
+			var targetType = attribute!.GetType();
 			var fieldInfo = targetType.GetField(InFieldName!, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
 
 			if (fieldInfo == null)
@@ -827,7 +862,7 @@ internal static class TypeInterface
 			if (!s_CachedAttributes.TryGetValue(InAttribute, out var attribute))
 				return;
 
-			*OutType = s_CachedTypes.Add(attribute.GetType());
+			*OutType = s_CachedTypes.Add(attribute!.GetType());
 		}
 		catch (Exception ex)
 		{

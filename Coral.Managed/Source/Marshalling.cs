@@ -44,20 +44,20 @@ public static class Marshalling
 
 			if (fieldArray != null)
 			{
-				// NOTE: there most likely exists a better way to do this
-				// for now should do the trick
+				// NOTE(infirit89): there most likely exists a better way to do this
+				//					for now should do the trick
 				ArrayContainer container = new() 
 				{
 					Data = fieldArray.Value.AddrOfPinnedObject(),
-					Length = (fieldArray.Value.Target as Array).Length
+					Length = (fieldArray.Value.Target as Array)!.Length
 				};
 
 				var handle = GCHandle.Alloc(container, GCHandleType.Pinned);
-				//Marshal.WriteIntPtr(OutValue, fieldArray.Value.AddrOfPinnedObject());
-				unsafe 
+				unsafe
 				{
 					Buffer.MemoryCopy(handle.AddrOfPinnedObject().ToPointer(), OutValue.ToPointer(), Marshal.SizeOf<ArrayContainer>(), Marshal.SizeOf<ArrayContainer>());
 				}
+
 				handle.Free();
 			}
 			else
@@ -116,7 +116,7 @@ public static class Marshalling
 
 		var arrayContainer = MarshalPointer<ArrayContainer>(InArray);
 
-		// this if never succeeds????
+		// NOTE(infirit89): this if never succeeds????
 		if (ArrayStorage.HasFieldArray(null, null))
 		{
 			var fieldArray = ArrayStorage.GetFieldArray(null, null, null);

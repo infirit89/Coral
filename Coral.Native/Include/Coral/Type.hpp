@@ -104,10 +104,31 @@ namespace Coral {
 			}
 		}
 
+		template<typename... TArgs>
+		MethodInfo GetMethod(std::string_view InMethodName) const
+		{
+			constexpr size_t parameterCount = sizeof...(TArgs);
+			MethodInfo method;
+			if constexpr (parameterCount > 0) 
+			{
+				ManagedType parameterTypes[parameterCount];
+				AddToTypeArray<TArgs...>(parameterTypes, std::make_index_sequence<parameterCount> {});
+				method = GetMethodInternal(InMethodName, parameterTypes, parameterCount);
+			}
+			else 
+			{
+				method = GetMethodInternal(InMethodName, nullptr, 0);
+			}
+
+			return method;
+		}
+
+
 	private:
 		ManagedObject CreateInstanceInternal(const void** InParameters, const ManagedType* InParameterTypes, size_t InLength) const;
 		void InvokeStaticMethodInternal(std::string_view InMethodName, const void** InParameters, const ManagedType* InParameterTypes, size_t InLength) const;
 		void InvokeStaticMethodRetInternal(std::string_view InMethodName, const void** InParameters, const ManagedType* InParameterTypes, size_t InLength, void* InResultStorage) const;
+		MethodInfo GetMethodInternal(std::string_view InMethodName, const ManagedType* InParameterTypes, size_t InLength) const;
 
 	private:
 		TypeId m_Id = -1;

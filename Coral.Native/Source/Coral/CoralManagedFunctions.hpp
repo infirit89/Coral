@@ -38,6 +38,7 @@ namespace Coral {
 	using HasTypeAttributeFn = Bool32 (*)(TypeId, TypeId);
 	using GetTypeAttributesFn = void (*)(ManagedHandle, TypeId*, int32_t*);
 	using GetTypeManagedTypeFn = ManagedType (*)(TypeId);
+	using GetTypeMethodFn = ManagedHandle (*)(TypeId, String, const ManagedType*, int32_t);
 
 #pragma endregion
 
@@ -70,6 +71,7 @@ namespace Coral {
 	using CreateObjectFn = void* (*)(TypeId, Bool32, const void**, const ManagedType*, int32_t);
 	using InvokeMethodFn = void (*)(void*, String, const void**, const ManagedType*, int32_t);
 	using InvokeMethodRetFn = void (*)(void*, String, const void**, const ManagedType*, int32_t, void*);
+	using InvokeMethodByMethodInfoFn = void (*)(void*, ManagedHandle, const void**, int32_t);
 	using InvokeStaticMethodFn = void (*)(TypeId, String, const void**, const ManagedType*, int32_t);
 	using InvokeStaticMethodRetFn = void (*)(TypeId, String, const void**, const ManagedType*, int32_t, void*);
 	using SetFieldValueFn = void (*)(void*, String, void*);
@@ -109,6 +111,7 @@ namespace Coral {
 		HasTypeAttributeFn HasTypeAttributeFptr = nullptr;
 		GetTypeAttributesFn GetTypeAttributesFptr = nullptr;
 		GetTypeManagedTypeFn GetTypeManagedTypeFptr = nullptr;
+		GetTypeMethodFn GetTypeMethodFptr = nullptr;
 
 #pragma endregion
 
@@ -142,6 +145,7 @@ namespace Coral {
 		CreateAssemblyLoadContextFn CreateAssemblyLoadContextFptr = nullptr;
 		InvokeMethodFn InvokeMethodFptr = nullptr;
 		InvokeMethodRetFn InvokeMethodRetFptr = nullptr;
+		InvokeMethodByMethodInfoFn InvokeMethodByMethodInfoFptr = nullptr;
 		InvokeStaticMethodFn InvokeStaticMethodFptr = nullptr;
 		InvokeStaticMethodRetFn InvokeStaticMethodRetFptr = nullptr;
 		SetFieldValueFn SetFieldValueFptr = nullptr;

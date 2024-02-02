@@ -26,6 +26,6 @@ namespace Coral {
 		std::vector<Type*> m_ParameterTypes;
 
 		friend class Type;
+		friend class ManagedObject;
 	};
-
 }

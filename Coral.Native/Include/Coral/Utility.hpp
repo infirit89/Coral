@@ -21,8 +21,9 @@ namespace Coral {
 		Double,
 
 		Bool,
+		Char,
 
-		Pointer,
+		Pointer
 	};
 
 	template<typename TArg>
@@ -71,10 +72,40 @@ namespace Coral {
 		}
 	}
 
+	template<typename TArg, size_t TIndex>
+	inline void AddToTypeArrayI(ManagedType* InParameterTypes)
+	{
+		InParameterTypes[TIndex] = GetManagedType<std::remove_reference_t<TArg>>();
+	}
+
+	template<typename TArg, size_t TIndex>
+	inline void AddToValueArrayI(const void** InArgumentsArr, TArg&& InArg)
+	{
+		if constexpr (std::is_pointer_v<std::remove_reference_t<TArg>>)
+		{
+			InArgumentsArr[TIndex] = reinterpret_cast<const void*>(InArg);
+		}
+		else
+		{
+			InArgumentsArr[TIndex] = reinterpret_cast<const void*>(&InArg);
+		}
+	}
+
 	template <typename... TArgs, size_t... TIndices>
 	inline void AddToArray(const void** InArgumentsArr, ManagedType* InParameterTypes, TArgs&&... InArgs, const std::index_sequence<TIndices...>&)
 	{
 		(AddToArrayI<TArgs, TIndices>(InArgumentsArr, InParameterTypes, std::forward<TArgs>(InArgs)), ...);
 	}
 
+	template<typename... TArgs, size_t... TIndices>
+	inline void AddToTypeArray(ManagedType* InParameterTypes, const std::index_sequence<TIndices...>&)
+	{
+		(AddToTypeArrayI<TArgs, TIndices>(InParameterTypes), ...);
+	}
+
+	template<typename... TArgs, size_t... TIndices>
+	inline void AddToValueArray(const void** InArgumentsArr, TArgs&&... InArgs, const std::index_sequence<TIndices...>&)
+	{
+		(AddToValueArrayI<TArgs, TIndices>(InArgumentsArr, std::forward<TArgs>(InArgs)), ...);
+	}
 }

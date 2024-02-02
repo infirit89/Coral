@@ -157,6 +157,13 @@ namespace Coral {
 		String::Free(methodName);
 	}
 
+	MethodInfo Type::GetMethodInternal(std::string_view InMethodName, const ManagedType* InParameterTypes, size_t InLength) const
+	{
+		ScopedString methodName = String::New(InMethodName);
+		MethodInfo method;
+		method.m_Handle = s_ManagedFunctions.GetTypeMethodFptr(m_Id, methodName, InParameterTypes, InLength);
+		return method;
+	}
 
 	ReflectionType::operator Type&() const
 	{

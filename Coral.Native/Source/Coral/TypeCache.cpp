@@ -34,5 +34,4 @@ namespace Coral {
 		m_NameCache.clear();
 		m_IDCache.clear();
 	}
-
 }

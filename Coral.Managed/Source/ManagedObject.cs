@@ -28,6 +28,7 @@ internal enum ManagedType
 	Double,
 
 	Bool,
+	Char,
 
 	Pointer
 };
@@ -114,7 +115,7 @@ internal static class ManagedObject
 
 			if (constructor == null)
 			{
-				LogMessage($"Failed to find constructor for type {type.FullName} with {InParameterCount} parameters.", MessageLevel.Error);
+				LogMessage($"Failed to find constructor for type {type!.FullName} with {InParameterCount} parameters.", MessageLevel.Error);
 				return IntPtr.Zero;
 			}
 
@@ -124,23 +125,23 @@ internal static class ManagedObject
 
 			if (currentType != type || parameters == null)
 			{
-				result = TypeInterface.CreateInstance(type);
+				result = TypeInterface.CreateInstance(type!);
 
 				if (currentType != type)
 					constructor.Invoke(result, parameters);
 			}
 			else
 			{
-				result = TypeInterface.CreateInstance(type, parameters);
+				result = TypeInterface.CreateInstance(type!, parameters);
 			}
 
 			if (result == null)
 			{
-				LogMessage($"Failed to instantiate type {type.FullName}.", MessageLevel.Error);
+				LogMessage($"Failed to instantiate type {type!.FullName}.", MessageLevel.Error);
 			}
 
 			var handle = GCHandle.Alloc(result, InWeakRef ? GCHandleType.Weak : GCHandleType.Normal);
-			AssemblyLoader.RegisterHandle(type.Assembly, handle);
+			AssemblyLoader.RegisterHandle(type!.Assembly, handle);
 			return GCHandle.ToIntPtr(handle);
 		}
 		catch (Exception ex)
@@ -174,7 +175,7 @@ internal static class ManagedObject
 		}
 	}
 
-	private static unsafe MethodInfo? TryGetMethodInfo(Type InType, string InMethodName, ManagedType* InParameterTypes, int InParameterCount, BindingFlags InBindingFlags)
+	internal static unsafe MethodInfo? TryGetMethodInfo(Type InType, string InMethodName, ManagedType* InParameterTypes, int InParameterCount, BindingFlags InBindingFlags)
 	{
 		MethodInfo? methodInfo = null;
 
@@ -189,7 +190,7 @@ internal static class ManagedObject
 			}
 		}
 
-		var methodKey = new MethodKey(InType.FullName, InMethodName, parameterTypes, InParameterCount);
+		var methodKey = new MethodKey(InType.FullName!, InMethodName, parameterTypes, InParameterCount);
 
 		if (!s_CachedMethods.TryGetValue(methodKey, out methodInfo))
 		{
@@ -227,8 +228,11 @@ internal static class ManagedObject
 				return;
 			}
 
-			var methodInfo = TryGetMethodInfo(type, InMethodName, InParameterTypes, InParameterCount, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
+			var methodInfo = TryGetMethodInfo(type!, InMethodName, InParameterTypes, InParameterCount, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
 			var parameters = Marshalling.MarshalParameterArray(InParameters, InParameterCount, methodInfo);
+
+			if (methodInfo == null)
+				return;
 
 			methodInfo.Invoke(null, parameters);
 		}
@@ -249,8 +253,11 @@ internal static class ManagedObject
 				return;
 			}
 
-			var methodInfo = TryGetMethodInfo(type, InMethodName, InParameterTypes, InParameterCount, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
+			var methodInfo = TryGetMethodInfo(type!, InMethodName, InParameterTypes, InParameterCount, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
 			var methodParameters = Marshalling.MarshalParameterArray(InParameters, InParameterCount, methodInfo);
+
+			if (methodInfo == null)
+				return;
 
 			object? value = methodInfo.Invoke(null, methodParameters);
 
@@ -283,6 +290,9 @@ internal static class ManagedObject
 			var methodInfo = TryGetMethodInfo(targetType, InMethodName, InParameterTypes, InParameterCount, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
 			var parameters = Marshalling.MarshalParameterArray(InParameters, InParameterCount, methodInfo);
 
+			if (methodInfo == null)
+				return;
+
 			methodInfo.Invoke(target, parameters);
 		}
 		catch (Exception ex)
@@ -307,6 +317,9 @@ internal static class ManagedObject
 			var targetType = target.GetType();
 
 			var methodInfo = TryGetMethodInfo(targetType, InMethodName, InParameterTypes, InParameterCount, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+			if (methodInfo == null)
+				return;
+
 			var methodParameters = Marshalling.MarshalParameterArray(InParameters, InParameterCount, methodInfo);
 			
 			object? value = methodInfo.Invoke(target, methodParameters);
@@ -317,6 +330,35 @@ internal static class ManagedObject
 			Marshalling.MarshalReturnValue(target, value, methodInfo, InResultStorage);
 		}
 		catch (Exception ex)
+		{
+			HandleException(ex);
+		}
+	}
+
+	[UnmanagedCallersOnly]
+	internal static unsafe void InvokeMethodByMethodInfo(IntPtr InObjectHandle, int methodHandle, IntPtr InParameters, int InParameterCount) 
+	{
+		try 
+		{
+			if(!TypeInterface.s_CachedMethods.TryGetValue(methodHandle, out var methodInfo)) 
+			{
+                LogMessage($"Cannot find method with id {methodHandle}", MessageLevel.Error);
+				return;
+            }
+
+			var target = GCHandle.FromIntPtr(InObjectHandle).Target;
+
+			if (target == null) 
+			{
+                LogMessage($"Cannot invoke method {methodInfo!.Name} on object with handle {InObjectHandle}. Target was null.", MessageLevel.Error);
+                return;
+            }
+
+			var methodParameters = Marshalling.MarshalParameterArray(InParameters, InParameterCount, methodInfo);
+
+			methodInfo!.Invoke(target, methodParameters);
+		}
+		catch(Exception ex)
 		{
 			HandleException(ex);
 		}
