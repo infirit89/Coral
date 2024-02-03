@@ -11,6 +11,10 @@ namespace Coral {
 	class MethodInfo
 	{
 	public:
+		MethodInfo() = default;
+		MethodInfo(ManagedHandle handle) 
+		 : m_Handle(handle) { }
+
 		String GetName() const;
 
 		Type& GetReturnType();
@@ -19,6 +23,7 @@ namespace Coral {
 		TypeAccessibility GetAccessibility() const;
 
 		std::vector<Attribute> GetAttributes() const;
+		ManagedHandle GetHandle() const { return m_Handle; }
 
 	private:
 		ManagedHandle m_Handle = -1;

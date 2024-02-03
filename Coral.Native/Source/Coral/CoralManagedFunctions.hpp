@@ -75,7 +75,9 @@ namespace Coral {
 	using InvokeStaticMethodFn = void (*)(TypeId, String, const void**, const ManagedType*, int32_t);
 	using InvokeStaticMethodRetFn = void (*)(TypeId, String, const void**, const ManagedType*, int32_t, void*);
 	using SetFieldValueFn = void (*)(void*, String, void*);
+	using SetFieldValueByFieldInfoFn = void (*)(void*, int, void*);
 	using GetFieldValueFn = void (*)(void*, String, void*);
+	using GetFieldValueByFieldInfoFn = void (*)(void*, int, void*);
 	using SetPropertyValueFn = void (*)(void*, String, void*);
 	using GetPropertyValueFn = void (*)(void*, String, void*);
 	using DestroyObjectFn = void (*)(void*);
@@ -149,7 +151,9 @@ namespace Coral {
 		InvokeStaticMethodFn InvokeStaticMethodFptr = nullptr;
 		InvokeStaticMethodRetFn InvokeStaticMethodRetFptr = nullptr;
 		SetFieldValueFn SetFieldValueFptr = nullptr;
+		SetFieldValueByFieldInfoFn SetFieldValueByFieldInfoFptr = nullptr;
 		GetFieldValueFn GetFieldValueFptr = nullptr;
+		GetFieldValueByFieldInfoFn GetFieldValueByFieldInfoFptr = nullptr;
 		SetPropertyValueFn SetPropertyValueFptr = nullptr;
 		GetPropertyValueFn GetPropertyValueFptr = nullptr;
 		DestroyObjectFn DestroyObjectFptr = nullptr;

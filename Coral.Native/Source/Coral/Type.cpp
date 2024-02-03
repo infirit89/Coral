@@ -56,7 +56,7 @@ namespace Coral {
 
 		std::vector<MethodInfo> methods(handles.size());
 		for (size_t i = 0; i < handles.size(); i++)
-			methods[i].m_Handle = handles[i];
+			methods[i] = handles[i];
 
 		return methods;
 	}
@@ -70,7 +70,7 @@ namespace Coral {
 
 		std::vector<FieldInfo> fields(handles.size());
 		for (size_t i = 0; i < handles.size(); i++)
-			fields[i].m_Handle = handles[i];
+			fields[i] = handles[i];
 
 		return fields;
 	}
@@ -160,8 +160,7 @@ namespace Coral {
 	MethodInfo Type::GetMethodInternal(std::string_view InMethodName, const ManagedType* InParameterTypes, size_t InLength) const
 	{
 		ScopedString methodName = String::New(InMethodName);
-		MethodInfo method;
-		method.m_Handle = s_ManagedFunctions.GetTypeMethodFptr(m_Id, methodName, InParameterTypes, InLength);
+		MethodInfo method = s_ManagedFunctions.GetTypeMethodFptr(m_Id, methodName, InParameterTypes, InLength);
 		return method;
 	}
 

@@ -11,12 +11,18 @@ namespace Coral {
 	class FieldInfo
 	{
 	public:
+		FieldInfo() = default;
+		FieldInfo(ManagedHandle handle)
+		    : m_Handle(handle) { }
+
 		String GetName() const;
 		Type& GetType();
 
 		TypeAccessibility GetAccessibility() const;
 
 		std::vector<Attribute> GetAttributes() const;
+
+		ManagedHandle GetHandle() const { return m_Handle; }
 
 	private:
 		ManagedHandle m_Handle = -1;

@@ -336,13 +336,13 @@ internal static class ManagedObject
 	}
 
 	[UnmanagedCallersOnly]
-	internal static unsafe void InvokeMethodByMethodInfo(IntPtr InObjectHandle, int methodHandle, IntPtr InParameters, int InParameterCount) 
+	internal static unsafe void InvokeMethodByMethodInfo(IntPtr InObjectHandle, int InMethodHandle, IntPtr InParameters, int InParameterCount) 
 	{
 		try 
 		{
-			if(!TypeInterface.s_CachedMethods.TryGetValue(methodHandle, out var methodInfo)) 
+			if(!TypeInterface.s_CachedMethods.TryGetValue(InMethodHandle, out var methodInfo)) 
 			{
-                LogMessage($"Cannot find method with id {methodHandle}", MessageLevel.Error);
+                LogMessage($"Cannot find method with id {InMethodHandle}", MessageLevel.Error);
 				return;
             }
 
@@ -396,6 +396,34 @@ internal static class ManagedObject
 	}
 
 	[UnmanagedCallersOnly]
+	internal static void SetFieldValueByFieldInfo(IntPtr InTarget, int InFieldHandle, IntPtr InValue) 
+	{
+		try
+		{
+			if (!TypeInterface.s_CachedFields.TryGetValue(InFieldHandle, out var fieldInfo))
+			{
+				LogMessage($"Cannot find field with id {InFieldHandle}", MessageLevel.Error);
+				return;
+			}
+
+			var target = GCHandle.FromIntPtr(InTarget).Target;
+
+            if (target == null)
+            {
+                LogMessage($"Cannot set value of field {fieldInfo!.Name} on object with handle {InTarget}. Target was null.", MessageLevel.Error);
+                return;
+            }
+
+			object? value = Marshalling.MarshalPointer(InValue, fieldInfo!.FieldType);
+			fieldInfo.SetValue(target, value);
+        }
+		catch (Exception ex) 
+		{
+			HandleException(ex);
+		}
+	}
+
+	[UnmanagedCallersOnly]
 	internal static void GetFieldValue(IntPtr InTarget, NativeString InFieldName, IntPtr OutValue)
 	{
 		try
@@ -424,6 +452,33 @@ internal static class ManagedObject
 			HandleException(ex);
 		}
 	}
+
+	[UnmanagedCallersOnly]
+	internal static void GetFieldValueByFieldInfo(IntPtr InTarget, int InFieldHandle, IntPtr OutValue) 
+	{
+        try
+        {
+            if (!TypeInterface.s_CachedFields.TryGetValue(InFieldHandle, out var fieldInfo))
+            {
+                LogMessage($"Cannot find field with id {InFieldHandle}", MessageLevel.Error);
+                return;
+            }
+
+            var target = GCHandle.FromIntPtr(InTarget).Target;
+
+            if (target == null)
+            {
+                LogMessage($"Cannot get value of field {fieldInfo!.Name} from object with handle {InTarget}. Target was null.", MessageLevel.Error);
+                return;
+            }
+
+            Marshalling.MarshalReturnValue(target, fieldInfo!.GetValue(target), fieldInfo, OutValue);
+        }
+        catch (Exception ex)
+        {
+            HandleException(ex);
+        }
+    }
 
 	[UnmanagedCallersOnly]
 	internal static void SetPropertyValue(IntPtr InTarget, NativeString InPropertyName, IntPtr InValue)

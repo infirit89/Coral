@@ -38,11 +38,21 @@ namespace Coral {
 		String::Free(fieldName);
 	}
 
+	void ManagedObject::SetFieldValueByHandleRaw(ManagedHandle InFieldHandle, void* InValue) const
+	{
+		s_ManagedFunctions.SetFieldValueByFieldInfoFptr(m_Handle, InFieldHandle, InValue);
+	}
+
 	void ManagedObject::GetFieldValueRaw(std::string_view InFieldName, void* OutValue) const
 	{
 		auto fieldName = String::New(InFieldName);
 		s_ManagedFunctions.GetFieldValueFptr(m_Handle, fieldName, OutValue);
 		String::Free(fieldName);
+	}
+
+	void ManagedObject::GetFieldValueByHandleRaw(ManagedHandle InFieldHandle, void* OutValue) const
+	{
+		s_ManagedFunctions.GetFieldValueByFieldInfoFptr(m_Handle, InFieldHandle, OutValue);
 	}
 
 	void ManagedObject::SetPropertyValueRaw(std::string_view InPropertyName, void* InValue) const
@@ -80,6 +90,4 @@ namespace Coral {
 		m_Handle = nullptr;
 		m_Type = nullptr;
 	}
-
 }
-
