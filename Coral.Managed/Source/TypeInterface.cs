@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Data.Common;
 using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -139,6 +140,47 @@ internal static class TypeInterface
 			for (int i = 0; i < assemblyTypes.Length; i++)
 			{
 				OutTypes[i] = s_CachedTypes.Add(assemblyTypes[i]);
+			}
+		}
+		catch (Exception ex)
+		{
+			HandleException(ex);
+		}
+	}
+
+	[UnmanagedCallersOnly]
+	internal static unsafe void GetSystemTypes(int* OutTypes, int* OutTypeCount) 
+	{
+		try
+		{
+			Type[] typesToCache = 
+			{ 
+				typeof(byte),
+                typeof(ushort),
+                typeof(uint),
+                typeof(ulong),
+
+                typeof(sbyte),
+                typeof(short),
+                typeof(int),
+                typeof(long),
+
+                typeof(float),
+                typeof(double),
+
+                typeof(char),
+                typeof(bool)
+            };
+
+			if (OutTypeCount != null)
+				*OutTypeCount = typesToCache.Length;
+
+			if (OutTypes == null)
+				return;
+
+			for (int i = 0; i < typesToCache.Length; i++)
+			{
+				OutTypes[i] = s_CachedTypes.Add(typesToCache[i]);
 			}
 		}
 		catch (Exception ex)

@@ -52,6 +52,9 @@ public static class Marshalling
 					Length = (fieldArray.Value.Target as Array)!.Length
 				};
 
+				Array? arr = fieldArray.Value.Target as Array;
+				Console.WriteLine(arr!.Length);
+
 				var handle = GCHandle.Alloc(container, GCHandleType.Pinned);
 				unsafe
 				{

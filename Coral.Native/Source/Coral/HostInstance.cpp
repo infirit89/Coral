@@ -92,6 +92,18 @@ namespace Coral {
 		AssemblyLoadContext alc;
 		alc.m_ContextId = s_ManagedFunctions.CreateAssemblyLoadContextFptr(name);
 		alc.m_Host = this;
+
+		int32_t typeCount = 0;
+		s_ManagedFunctions.GetSystemTypesFptr(nullptr, &typeCount);
+		std::vector<TypeId> typeIds(typeCount);
+		s_ManagedFunctions.GetSystemTypesFptr(typeIds.data(), &typeCount);
+		for (auto typeId : typeIds)
+		{
+			Type type;
+			type.m_Id = typeId;
+			TypeCache::Get().CacheType(std::move(type));
+		}
+
 		return alc;
 	}
 
@@ -263,6 +275,7 @@ namespace Coral {
 #pragma region TypeInterface
 
 		s_ManagedFunctions.GetAssemblyTypesFptr = LoadCoralManagedFunctionPtr<GetAssemblyTypesFn>(CORAL_STR("Coral.Managed.TypeInterface, Coral.Managed"), CORAL_STR("GetAssemblyTypes"));
+		s_ManagedFunctions.GetSystemTypesFptr = LoadCoralManagedFunctionPtr<GetSystemTypesFn>(CORAL_STR("Coral.Managed.TypeInterface, Coral.Managed"), CORAL_STR("GetSystemTypes"));
 		s_ManagedFunctions.GetTypeIdFptr = LoadCoralManagedFunctionPtr<GetTypeIdFn>(CORAL_STR("Coral.Managed.TypeInterface, Coral.Managed"), CORAL_STR("GetTypeId"));
 		s_ManagedFunctions.GetFullTypeNameFptr = LoadCoralManagedFunctionPtr<GetFullTypeNameFn>(CORAL_STR("Coral.Managed.TypeInterface, Coral.Managed"), CORAL_STR("GetFullTypeName"));
 		s_ManagedFunctions.GetAssemblyQualifiedNameFptr = LoadCoralManagedFunctionPtr<GetAssemblyQualifiedNameFn>(CORAL_STR("Coral.Managed.TypeInterface, Coral.Managed"), CORAL_STR("GetAssemblyQualifiedName"));
@@ -317,6 +330,11 @@ namespace Coral {
 		s_ManagedFunctions.GetAttributeFieldValueFptr = LoadCoralManagedFunctionPtr<GetAttributeFieldValueFn>(CORAL_STR("Coral.Managed.TypeInterface, Coral.Managed"), CORAL_STR("GetAttributeFieldValue"));
 		s_ManagedFunctions.GetAttributeTypeFptr = LoadCoralManagedFunctionPtr<GetAttributeTypeFn>(CORAL_STR("Coral.Managed.TypeInterface, Coral.Managed"), CORAL_STR("GetAttributeType"));
 
+#pragma endregion
+
+#pragma region ManagedArray
+		s_ManagedFunctions.CreateArrayFptr = LoadCoralManagedFunctionPtr<CreatedArrayFn>(CORAL_STR("Coral.Managed.ManagedArray, Coral.Managed"), CORAL_STR("CreateArray"));
+		s_ManagedFunctions.CreateArrayFptr = LoadCoralManagedFunctionPtr<CreatedArrayFn>(CORAL_STR("Coral.Managed.ManagedArray, Coral.Managed"), CORAL_STR("GetLength"));
 #pragma endregion
 
 		s_ManagedFunctions.SetInternalCallsFptr = LoadCoralManagedFunctionPtr<SetInternalCallsFn>(CORAL_STR("Coral.Managed.Interop.InternalCallsManager, Coral.Managed"), CORAL_STR("SetInternalCalls"));

@@ -171,7 +171,8 @@ public static class ArrayStorage
 		{
 			try
 			{
-				handle.Free();
+				if(GCHandle.ToIntPtr(handle) != IntPtr.Zero)
+					handle.Free();
 			}
 			catch (InvalidOperationException ex) 
 			{

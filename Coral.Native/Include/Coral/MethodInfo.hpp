@@ -24,6 +24,7 @@ namespace Coral {
 
 		std::vector<Attribute> GetAttributes() const;
 		ManagedHandle GetHandle() const { return m_Handle; }
+		operator ManagedHandle() const { return m_Handle; }
 
 	private:
 		ManagedHandle m_Handle = -1;

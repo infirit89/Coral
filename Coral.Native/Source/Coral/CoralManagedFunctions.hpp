@@ -11,6 +11,7 @@ namespace Coral {
 	enum class GCCollectionMode;
 	enum class ManagedType;
 	class ManagedField;
+	class ManagedArray;
 
 	using SetInternalCallsFn = void (*)(void*, int32_t);
 	using CreateAssemblyLoadContextFn = int32_t (*)(String);
@@ -22,6 +23,7 @@ namespace Coral {
 #pragma region TypeInterface
 
 	using GetAssemblyTypesFn = void (*)(int32_t, TypeId*, int32_t*);
+	using GetSystemTypesFn = void (*)(TypeId*, int32_t*);
 	using GetTypeIdFn = void (*)(String, TypeId*);
 	using GetFullTypeNameFn = String (*)(TypeId);
 	using GetAssemblyQualifiedNameFn = String (*)(TypeId);
@@ -68,6 +70,11 @@ namespace Coral {
 	using GetAttributeTypeFn = void (*)(ManagedHandle, TypeId*);
 #pragma endregion
 
+#pragma region ManagedArray
+	using CreatedArrayFn = void (*)(TypeId, const int32_t*, int32_t, ManagedArray*);
+	using GetArrayLengthFn = int (*)(void*, int32_t);
+#pragma endregion
+
 	using CreateObjectFn = void* (*)(TypeId, Bool32, const void**, const ManagedType*, int32_t);
 	using InvokeMethodFn = void (*)(void*, String, const void**, const ManagedType*, int32_t);
 	using InvokeMethodRetFn = void (*)(void*, String, const void**, const ManagedType*, int32_t, void*);
@@ -97,6 +104,7 @@ namespace Coral {
 #pragma region TypeInterface
 
 		GetAssemblyTypesFn GetAssemblyTypesFptr = nullptr;
+		GetSystemTypesFn GetSystemTypesFptr = nullptr;
 		GetTypeIdFn GetTypeIdFptr = nullptr;
 		GetFullTypeNameFn GetFullTypeNameFptr = nullptr;
 		GetAssemblyQualifiedNameFn GetAssemblyQualifiedNameFptr = nullptr;
@@ -141,6 +149,11 @@ namespace Coral {
 #pragma region Attribute
 		GetAttributeFieldValueFn GetAttributeFieldValueFptr = nullptr;
 		GetAttributeTypeFn GetAttributeTypeFptr = nullptr;
+#pragma endregion
+
+#pragma region ManagedArray
+		CreatedArrayFn CreateArrayFptr = nullptr;
+		GetArrayLengthFn GetArrayLengthFptr = nullptr;
 #pragma endregion
 
 		CreateObjectFn CreateObjectFptr = nullptr;
