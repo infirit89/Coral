@@ -10,6 +10,8 @@
 #include <Coral/GC.hpp>
 #include <Coral/Array.hpp>
 #include <Coral/Attribute.hpp>
+#include <Coral/ManagedArray.hpp>
+#include <Coral/TypeCache.hpp>
 
 Coral::Type g_TestsType;
 
@@ -472,6 +474,26 @@ int main(int argc, char** argv)
 	RegisterTestInternalCalls(assembly);
 	assembly.UploadInternalCalls();
 
+	Coral::Type& t = assembly.GetType("Testing.Managed.FieldMarshalTest");
+	Coral::Type& intType = assembly.GetType("System.Int32");
+	Coral::ManagedObject obj = t.CreateInstance();
+	Coral::ManagedArray arr = obj.GetFieldValue<Coral::ManagedArray>("IntArrayTest");
+	int32_t newSize = arr.GetLength(0) + 1;
+	Coral::ManagedArray temp = Coral::ManagedArray::New(arr.GetType().GetElementType(), newSize);
+	memcpy(temp.Data(), arr.Data(), std::min(newSize, arr.GetLength(0)) * arr.GetType().GetElementType().GetSize());
+	arr = temp;
+	arr.SetValue(arr.GetLength(0) - 1, 70);
+	obj.SetFieldValue("IntArrayTest", arr);
+	obj.InvokeMethod("PrintIntArray");
+	arr = obj.GetFieldValue<Coral::ManagedArray>("IntArrayTest");
+	for (size_t i = 0; i < arr.GetLength(0); i++)
+	{
+		std::cout << arr.GetValue<int32_t>(i) << std::endl;
+	}
+	//void* d = arr.Data();
+	//Coral::ManagedArray arr2 = Coral::ManagedArray::New(intType, arr.GetLength(0) + 1);
+	//arr.SetValue(2, 52);
+
 	auto& testsType = assembly.GetType("Testing.Managed.Tests");
 	g_TestsType = testsType;
 	testsType.InvokeStaticMethod("StaticMethodTest", 50.0f);
@@ -602,6 +624,7 @@ int main(int argc, char** argv)
 	testsInstance2.InvokeMethod("RunManagedTests");
 	testsInstance2.Destroy();
 	instance.Destroy();
+
 	std::cin.get();
 
 	return 0;

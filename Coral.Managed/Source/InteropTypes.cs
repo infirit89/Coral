@@ -140,21 +140,25 @@ public static class ArrayStorage
 
 	public static GCHandle? GetFieldArray(object? InTarget, object? InValue, MemberInfo? InArrayMemberInfo)
 	{
-		if (InArrayMemberInfo == null)
+		if (InArrayMemberInfo == null && InTarget == null)
 			return null;
 
-		int arrayId = InArrayMemberInfo.GetHashCode();
+		int arrayId = InArrayMemberInfo != null ? InArrayMemberInfo.GetHashCode() : 0;
 		arrayId += InTarget != null ? InTarget.GetHashCode() : 0;
 
-		if (!s_FieldArrays.TryGetValue(arrayId, out var arrayHandle))
+		if (!s_FieldArrays.TryGetValue(arrayId, out var arrayHandle) || arrayHandle.Target != InValue)
 		{
+			Console.WriteLine("here?");
+			if (arrayHandle.IsAllocated)
+				arrayHandle.Free();
+
 			var arrayObject = InValue as Array;
-			arrayHandle = GCHandle.Alloc(arrayObject, GCHandleType.Pinned);
+			arrayHandle = GCHandle.Alloc(arrayObject, GCHandleType.Normal);
 
 			if(InTarget != null)
 				AssemblyLoader.RegisterHandle(InTarget.GetType().Assembly, arrayHandle);
 
-			s_FieldArrays.Add(arrayId, arrayHandle);
+			s_FieldArrays[arrayId] = arrayHandle;
 		}
 
 		return arrayHandle;

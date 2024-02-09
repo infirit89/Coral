@@ -144,6 +144,7 @@ namespace Coral {
 		friend class Attribute;
 		friend class ReflectionType;
 		friend class ManagedObject;
+		friend class ManagedArray;
 	};
 
 	class ReflectionType

@@ -334,7 +334,10 @@ namespace Coral {
 
 #pragma region ManagedArray
 		s_ManagedFunctions.CreateArrayFptr = LoadCoralManagedFunctionPtr<CreatedArrayFn>(CORAL_STR("Coral.Managed.ManagedArray, Coral.Managed"), CORAL_STR("CreateArray"));
-		s_ManagedFunctions.CreateArrayFptr = LoadCoralManagedFunctionPtr<CreatedArrayFn>(CORAL_STR("Coral.Managed.ManagedArray, Coral.Managed"), CORAL_STR("GetLength"));
+		s_ManagedFunctions.GetArrayLengthFptr = LoadCoralManagedFunctionPtr<GetArrayLengthFn>(CORAL_STR("Coral.Managed.ManagedArray, Coral.Managed"), CORAL_STR("GetLength"));
+		s_ManagedFunctions.GetArrayValueFptr = LoadCoralManagedFunctionPtr<GetArrayValueFn>(CORAL_STR("Coral.Managed.ManagedArray, Coral.Managed"), CORAL_STR("GetValue"));
+		s_ManagedFunctions.SetArrayValueFptr = LoadCoralManagedFunctionPtr<SetArrayValueFn>(CORAL_STR("Coral.Managed.ManagedArray, Coral.Managed"), CORAL_STR("SetValue"));
+		s_ManagedFunctions.GetArrayDataReferenceFptr = LoadCoralManagedFunctionPtr<GetArrayDataReferenceFn>(CORAL_STR("Coral.Managed.ManagedArray, Coral.Managed"), CORAL_STR("GetDataReference"));
 #pragma endregion
 
 		s_ManagedFunctions.SetInternalCallsFptr = LoadCoralManagedFunctionPtr<SetInternalCallsFn>(CORAL_STR("Coral.Managed.Interop.InternalCallsManager, Coral.Managed"), CORAL_STR("SetInternalCalls"));

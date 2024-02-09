@@ -49,6 +49,8 @@ public class FieldMarshalTest
 
 	public int[] IntArrayProp { get; set; } = new int[]{ 6, 10, 16, 24 };
 
+	public string[] StringArrayTest = new[] { "test1", "test2", "test3" };
+
 	public void ArrayParamTest(NativeArray<float> InArray)
 	{
 		foreach (var f in InArray)
@@ -58,6 +60,11 @@ public class FieldMarshalTest
 	public float[] ArrayReturnTest()
 	{
 		return new float[]{ 10.0f, 20.0f, 30.0f, 40.0f, 50.0f };
+	}
+
+	public void PrintIntArray() 
+	{
+		Console.WriteLine(string.Join(' ', IntArrayTest));
 	}
 
 	public void TestClassAndStruct()

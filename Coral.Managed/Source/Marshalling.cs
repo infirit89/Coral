@@ -10,7 +10,7 @@ namespace Coral.Managed;
 
 public static class Marshalling
 {
-	struct ArrayContainer
+	internal struct ArrayContainer
 	{
 		public IntPtr Data;
 		public int Length;
@@ -38,30 +38,18 @@ public static class Marshalling
 		if (type == null)
 			return;
 
-		if (type.IsSZArray)
+		if (type.IsArray)
 		{
 			var fieldArray = ArrayStorage.GetFieldArray(InTarget, InValue, InMemberInfo);
 
 			if (fieldArray != null)
 			{
-				// NOTE(infirit89): there most likely exists a better way to do this
-				//					for now should do the trick
-				ArrayContainer container = new() 
-				{
-					Data = fieldArray.Value.AddrOfPinnedObject(),
-					Length = (fieldArray.Value.Target as Array)!.Length
-				};
-
-				Array? arr = fieldArray.Value.Target as Array;
-				Console.WriteLine(arr!.Length);
-
-				var handle = GCHandle.Alloc(container, GCHandleType.Pinned);
 				unsafe
 				{
-					Buffer.MemoryCopy(handle.AddrOfPinnedObject().ToPointer(), OutValue.ToPointer(), Marshal.SizeOf<ArrayContainer>(), Marshal.SizeOf<ArrayContainer>());
-				}
-
-				handle.Free();
+					ArrayContainer* container = (ArrayContainer*)OutValue;
+					(*container).Data = GCHandle.ToIntPtr(fieldArray.Value);
+					(*container).Length = (fieldArray.Value.Target as Array)!.Rank;
+                }
 			}
 			else
 			{
@@ -118,6 +106,7 @@ public static class Marshalling
 			return null;
 
 		var arrayContainer = MarshalPointer<ArrayContainer>(InArray);
+		return GCHandle.FromIntPtr(arrayContainer.Data).Target;
 
 		// NOTE(infirit89): this if never succeeds????
 		if (ArrayStorage.HasFieldArray(null, null))
@@ -211,6 +200,7 @@ public static class Marshalling
 
 		// NOTE(Peter): Marshal.PtrToStructure<bool> doesn't seem to work
 		//				instead we have to read it as a single byte and check the raw value
+		Console.WriteLine(InType);
 		if (InType == typeof(bool))
 			return Marshal.PtrToStructure<byte>(InValue) > 0;
 
@@ -247,6 +237,69 @@ public static class Marshalling
 
 		return Marshal.PtrToStructure(InValue, InType);	
 	}
+
+	public static void MarshalObject(object? InTarget, object? InValue, Type InType, IntPtr OutValue)
+	{
+		if (InValue == null)
+			return;
+
+		Type type = InType;
+		if (type.IsArray) 
+		{
+            var fieldArray = ArrayStorage.GetFieldArray(InTarget, InValue, null);
+
+            if (fieldArray != null)
+            {
+                unsafe
+                {
+                    ArrayContainer* container = (ArrayContainer*)OutValue;
+                    (*container).Data = GCHandle.ToIntPtr(fieldArray.Value);
+                    (*container).Length = (fieldArray.Value.Target as Array)!.Rank;
+                }
+            }
+            else
+            {
+                Marshal.WriteIntPtr(OutValue, IntPtr.Zero);
+            }
+        }
+		else if (InValue is string str)
+		{
+			NativeString nativeString = str;
+			Marshal.StructureToPtr(nativeString, OutValue, false);
+		}
+		else if (InValue is NativeString nativeString)
+		{
+			Marshal.StructureToPtr(nativeString, OutValue, false);
+		}
+		else if (type.IsPointer)
+		{
+			unsafe
+			{
+				if (InValue == null)
+				{
+					Marshal.WriteIntPtr(OutValue, IntPtr.Zero);
+				}
+				else
+				{
+					void* valuePointer = Pointer.Unbox(InValue);
+					Buffer.MemoryCopy(&valuePointer, OutValue.ToPointer(), IntPtr.Size, IntPtr.Size);
+				}
+			}
+		}
+		else
+		{
+			int valueSize = type.IsEnum ? Marshal.SizeOf(Enum.GetUnderlyingType(type)) : Marshal.SizeOf(type);
+			var handle = GCHandle.Alloc(InValue, GCHandleType.Pinned);
+
+			unsafe
+			{
+				Buffer.MemoryCopy(handle.AddrOfPinnedObject().ToPointer(), OutValue.ToPointer(), valueSize, valueSize);
+			}
+
+			handle.Free();
+		}
+    }
+
 	public static T? MarshalPointer<T>(IntPtr InValue) => Marshal.PtrToStructure<T>(InValue);
 
 	public static IntPtr[] NativeArrayToIntPtrArray(IntPtr InNativeArray, int InLength)
