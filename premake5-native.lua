@@ -13,6 +13,7 @@ workspace "Coral"
 include "Coral.Native"
 
 group "Tests"
+	include "Tests/Testing.Native/Vendor/gtest/googletest"
 	include "Tests/Testing.Native"
 group ""
 

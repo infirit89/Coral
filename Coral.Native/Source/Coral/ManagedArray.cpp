@@ -30,12 +30,12 @@ namespace Coral {
 
 	void ManagedArray::Resize(int32_t InNewSize)
 	{
-		/*if (InNewSize < 0 || m_Rank > 1)
+		if (InNewSize < 0 || m_Rank > 1)
 			return;
 
-		ManagedArray temp = ManagedArray::New(GetType(), InNewSize);
-		memcpy(temp.Data(), Data(), std::min(InNewSize, GetLength(0)));
-		m_Handle*/
+		Coral::ManagedArray temp = Coral::ManagedArray::New(GetType().GetElementType(), InNewSize);
+		memcpy(temp.Data(), Data(), std::min(InNewSize, GetLength(0)) * GetType().GetElementType().GetSize());
+		*this = temp;
 	}
 
 	void ManagedArray::GetValueRaw(int32_t InIndex, void* OutValue)

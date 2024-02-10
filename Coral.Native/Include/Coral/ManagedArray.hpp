@@ -17,7 +17,15 @@ namespace Coral {
 		// NOTE: only for sz arrays
 		void Resize(int32_t InNewSize);
 
-		template<typename TReturn>
+		void GetValueRaw(int32_t InIndex, void* OutValue);
+		void GetValueRaw(const int32_t* InIndices, size_t InIndicesSize, void* OutValue);
+
+		void SetValueRaw(int32_t InIndex, void* InValue);
+		void SetValueRaw(const int32_t* InIndices, size_t InIndicesSize, void* InValue);
+
+		Type& GetType();
+	public:
+		template <typename TReturn>
 		TReturn GetValue(int32_t InIndex)
 		{
 			TReturn value;
@@ -33,25 +41,18 @@ namespace Coral {
 			return value;
 		}
 
-		template<typename TValue>
+		template <typename TValue>
 		void SetValue(int32_t InIndex, TValue InValue)
 		{
 			SetValueRaw(InIndex, &InValue);
 		}
 
-		template<typename TValue>
+		template <typename TValue>
 		void SetValue(const int32_t* InIndices, int32_t InIndicesSize, TValue InValue)
 		{
 			SetValueRaw(InIndices, InIndicesSize, &InValue);
 		}
 
-		void GetValueRaw(int32_t InIndex, void* OutValue);
-		void GetValueRaw(const int32_t* InIndices, size_t InIndicesSize, void* OutValue);
-
-		void SetValueRaw(int32_t InIndex, void* InValue);
-		void SetValueRaw(const int32_t* InIndices, size_t InIndicesSize, void* InValue);
-
-		Type& GetType();
 	private:
 		void* m_Handle = nullptr;
 		int32_t m_Rank = 0;

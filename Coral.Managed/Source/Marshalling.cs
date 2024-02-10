@@ -2,6 +2,7 @@
 
 using System;
 using System.Linq;
+using System.Net.Http.Headers;
 using System.Reflection;
 using System.Reflection.Metadata.Ecma335;
 using System.Runtime.InteropServices;
@@ -49,11 +50,18 @@ public static class Marshalling
 					ArrayContainer* container = (ArrayContainer*)OutValue;
 					(*container).Data = GCHandle.ToIntPtr(fieldArray.Value);
 					(*container).Length = (fieldArray.Value.Target as Array)!.Rank;
-                }
+				}
 			}
 			else
 			{
 				Marshal.WriteIntPtr(OutValue, IntPtr.Zero);
+			}
+		}
+		else if (InValue is bool) 
+		{
+			unsafe 
+			{
+				*(bool*)OutValue = (bool)InValue;
 			}
 		}
 		else if (InValue is string str)
@@ -84,7 +92,6 @@ public static class Marshalling
 		{
 			int valueSize = type.IsEnum ? Marshal.SizeOf(Enum.GetUnderlyingType(type)) : Marshal.SizeOf(type);
 			var handle = GCHandle.Alloc(InValue, GCHandleType.Pinned);
-
 			unsafe
 			{
 				Buffer.MemoryCopy(handle.AddrOfPinnedObject().ToPointer(), OutValue.ToPointer(), valueSize, valueSize);
@@ -200,7 +207,6 @@ public static class Marshalling
 
 		// NOTE(Peter): Marshal.PtrToStructure<bool> doesn't seem to work
 		//				instead we have to read it as a single byte and check the raw value
-		Console.WriteLine(InType);
 		if (InType == typeof(bool))
 			return Marshal.PtrToStructure<byte>(InValue) > 0;
 

@@ -4,20 +4,19 @@ using System;
 
 namespace Testing.Managed;
 
-public class DummyClass
-{
-	public float X;
-}
-
-public struct DummyStruct
-{
-	public float X;
-}
-
 public class FieldMarshalTest
 {
+    public class DummyClass
+    {
+        public float X;
+    }
 
-	public sbyte SByteFieldTest = 10;
+    public struct DummyStruct
+    {
+        public float X;
+    }
+
+    public sbyte SByteFieldTest = 10;
 	public byte ByteFieldTest = 10;
 	public short ShortFieldTest = 10;
 	public ushort UShortFieldTest = 10;
