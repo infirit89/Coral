@@ -17,6 +17,11 @@ public static class Marshalling
 		public int Length;
 	};
 
+	internal struct ObjectContainer 
+	{
+		public IntPtr Handle;
+	}
+
 	public static void MarshalReturnValue(object? InTarget, object? InValue, MemberInfo? InMemberInfo, IntPtr OutValue)
 	{
 		if (InMemberInfo == null)
@@ -57,9 +62,9 @@ public static class Marshalling
 				Marshal.WriteIntPtr(OutValue, IntPtr.Zero);
 			}
 		}
-		else if (InValue is bool) 
+		else if (InValue is bool)
 		{
-			unsafe 
+			unsafe
 			{
 				*(bool*)OutValue = (bool)InValue;
 			}
@@ -72,6 +77,16 @@ public static class Marshalling
 		else if (InValue is NativeString nativeString)
 		{
 			Marshal.StructureToPtr(nativeString, OutValue, false);
+		}
+		else if (type.IsClass) 
+		{
+			var handle = GCHandle.Alloc(InValue, GCHandleType.Normal);
+			AssemblyLoader.RegisterHandle(type.Assembly, handle);
+			unsafe
+			{
+				ObjectContainer* container = (ObjectContainer*)OutValue;
+				(*container).Handle = GCHandle.ToIntPtr(handle);
+			}
 		}
 		else if (type.IsPointer)
 		{

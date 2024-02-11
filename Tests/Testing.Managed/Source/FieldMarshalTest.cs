@@ -3,7 +3,6 @@
 using System;
 
 namespace Testing.Managed;
-
 public class FieldMarshalTest
 {
     public class DummyClass
@@ -28,27 +27,10 @@ public class FieldMarshalTest
 	public double DoubleFieldTest = 10.0;
 	public bool BoolFieldTest = false;
 	public string StringFieldTest = "Hello";
-	public DummyClass DummyClassTest;
-	public DummyStruct DummyStructTest;
-
-	public sbyte SBytePropertyTest { get; set; } = 10;
-	public byte BytePropertyTest { get; set; } = 10;
-	public short ShortPropertyTest { get; set; } = 10;
-	public ushort UShortPropertyTest { get; set; } = 10;
-	public int IntPropertyTest { get; set; } = 10;
-	public uint UIntPropertyTest { get; set; } = 10;
-	public long LongPropertyTest { get; set; } = 10;
-	public ulong ULongPropertyTest { get; set; } = 10;
-	public float FloatPropertyTest { get; set; } = 10.0f;
-	public double DoublePropertyTest { get; set; } = 10.0;
-	public bool BoolPropertyTest { get; set; } = false;
-	public string StringPropertyTest { get; set; } = "Hello";
+	public DummyClass DummyClassFieldTest;
+	public DummyStruct DummyStructFieldTest;
 
 	public int[] IntArrayTest = new[]{ 5, 2, 1, 64 };
-
-	public int[] IntArrayProp { get; set; } = new int[]{ 6, 10, 16, 24 };
-
-	public string[] StringArrayTest = new[] { "test1", "test2", "test3" };
 
 	public void ArrayParamTest(NativeArray<float> InArray)
 	{
@@ -68,14 +50,8 @@ public class FieldMarshalTest
 
 	public void TestClassAndStruct()
 	{
-		Console.WriteLine(DummyClassTest.X);
-		Console.WriteLine(DummyStructTest.X);
+		Console.WriteLine(DummyClassFieldTest.X);
+		Console.WriteLine(DummyStructFieldTest.X);
 	}
-
-	[Dummy(SomeValue = 1000.0f)]
-	public float AttributeFieldTest = 50.0f;
-
-	[Dummy(SomeValue = 10000.0f)]
-	public float AttributePropertyTest { get; private set; } = 50.0f;
 
 }

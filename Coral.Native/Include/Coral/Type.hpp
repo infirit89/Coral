@@ -123,6 +123,15 @@ namespace Coral {
 			return method;
 		}
 
+		template<typename TReturn>
+		TReturn GetStaticFieldValue(std::string_view InFieldName)
+		{
+			TReturn result;
+			GetStaticFieldValueRaw(InFieldName, &result);
+			return result;
+		}
+
+		void GetStaticFieldValueRaw(std::string_view InFieldName, void* OutValue) const;
 
 	private:
 		ManagedObject CreateInstanceInternal(const void** InParameters, const ManagedType* InParameterTypes, size_t InLength) const;

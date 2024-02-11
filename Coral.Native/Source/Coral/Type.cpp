@@ -135,6 +135,13 @@ namespace Coral {
 		return m_Id == InOther.m_Id;
 	}
 
+	void Type::GetStaticFieldValueRaw(std::string_view InFieldName, void* OutValue) const
+	{
+		auto fieldName = String::New(InFieldName);
+		s_ManagedFunctions.GetStaticFieldValueFptr(m_Id, fieldName, OutValue);
+		String::Free(fieldName);
+	}
+
 	ManagedObject Type::CreateInstanceInternal(const void** InParameters, const ManagedType* InParameterTypes, size_t InLength) const
 	{
 		ManagedObject result;

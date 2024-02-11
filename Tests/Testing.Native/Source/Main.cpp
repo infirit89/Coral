@@ -18,6 +18,11 @@
 #include "Globals.h"
 #include "NativeTest.h"
 #include "InternalCalls.h"
+#include "AttributeTest.h"
+#include "ScalarFieldMarshalTest.h"
+#include "ObjectFieldMarshalTest.h"
+#include "ScalarPropertyMarshalTest.h"
+#include "ObjectPropertyMarshalTest.h"
 
 Coral::Type g_TestsType;
 
@@ -92,249 +97,6 @@ void ExceptionCallback(std::string_view InMessage)
 //	});
 //}
 //
-//void RegisterFieldMarshalTests(Coral::HostInstance& InHost, Coral::ManagedObject InObject)
-//{
-//	RegisterTest("SByteFieldTest", [InObject]() mutable
-//	{
-//		auto value = InObject.GetFieldValue<char8_t>("SByteFieldTest");
-//		if (value != 10)
-//			return false;
-//		InObject.SetFieldValue<char8_t>("SByteFieldTest", 20);
-//		value = InObject.GetFieldValue<char8_t>("SByteFieldTest");
-//		return value == 20;
-//	});
-//
-//	RegisterTest("ByteFieldTest", [InObject]() mutable
-//	{
-//		auto value = InObject.GetFieldValue<uint8_t>("ByteFieldTest");
-//		if (value != 10)
-//			return false;
-//		InObject.SetFieldValue<uint8_t>("ByteFieldTest", 20);
-//		value = InObject.GetFieldValue<uint8_t>("ByteFieldTest");
-//		return value == 20;
-//	});
-//
-//	RegisterTest("ShortFieldTest", [InObject]() mutable
-//	{
-//		auto value = InObject.GetFieldValue<int16_t>("ShortFieldTest");
-//		if (value != 10)
-//			return false;
-//		InObject.SetFieldValue<int16_t>("ShortFieldTest", 20);
-//		value = InObject.GetFieldValue<int16_t>("ShortFieldTest");
-//		return value == 20;
-//	});
-//
-//	RegisterTest("UShortFieldTest", [InObject]() mutable
-//	{
-//		auto value = InObject.GetFieldValue<uint16_t>("UShortFieldTest");
-//		if (value != 10)
-//			return false;
-//		InObject.SetFieldValue<uint16_t>("UShortFieldTest", 20);
-//		value = InObject.GetFieldValue<uint16_t>("UShortFieldTest");
-//		return value == 20;
-//	});
-//
-//	RegisterTest("IntFieldTest", [InObject]() mutable
-//	{
-//		auto value = InObject.GetFieldValue<int32_t>("IntFieldTest");
-//		if (value != 10)
-//			return false;
-//		InObject.SetFieldValue<int32_t>("IntFieldTest", 20);
-//		value = InObject.GetFieldValue<int32_t>("IntFieldTest");
-//		return value == 20;
-//	});
-//
-//	RegisterTest("UIntFieldTest", [InObject]() mutable
-//	{
-//		auto value = InObject.GetFieldValue<uint32_t>("UIntFieldTest");
-//		if (value != 10)
-//			return false;
-//		InObject.SetFieldValue<uint32_t>("UIntFieldTest", 20);
-//		value = InObject.GetFieldValue<uint32_t>("UIntFieldTest");
-//		return value == 20;
-//	});
-//
-//	RegisterTest("LongFieldTest", [InObject]() mutable
-//	{
-//		auto value = InObject.GetFieldValue<int64_t>("LongFieldTest");
-//		if (value != 10)
-//			return false;
-//		InObject.SetFieldValue<int64_t>("LongFieldTest", 20);
-//		value = InObject.GetFieldValue<int64_t>("LongFieldTest");
-//		return value == 20;
-//	});
-//
-//	RegisterTest("ULongFieldTest", [InObject]() mutable
-//	{
-//		auto value = InObject.GetFieldValue<uint64_t>("ULongFieldTest");
-//		if (value != 10)
-//			return false;
-//		InObject.SetFieldValue<uint64_t>("ULongFieldTest", 20);
-//		value = InObject.GetFieldValue<uint64_t>("ULongFieldTest");
-//		return value == 20;
-//	});
-//
-//	RegisterTest("FloatFieldTest", [InObject]() mutable
-//	{
-//		auto value = InObject.GetFieldValue<float>("FloatFieldTest");
-//		if (value - 10.0f > 0.001f)
-//			return false;
-//		InObject.SetFieldValue<float>("FloatFieldTest", 20);
-//		value = InObject.GetFieldValue<float>("FloatFieldTest");
-//		return value - 20.0f < 0.001f;
-//	});
-//
-//	RegisterTest("DoubleFieldTest", [InObject]() mutable
-//	{
-//		auto value = InObject.GetFieldValue<double>("DoubleFieldTest");
-//		if (value - 10.0 > 0.001)
-//			return false;
-//		InObject.SetFieldValue<double>("DoubleFieldTest", 20);
-//		value = InObject.GetFieldValue<double>("DoubleFieldTest");
-//		return value - 20.0 < 0.001;
-//	});
-//	
-//	RegisterTest("BoolFieldTest", [InObject]() mutable
-//	{
-//		auto value = InObject.GetFieldValue<Coral::Bool32>("BoolFieldTest");
-//		if (value != false)
-//			return false;
-//		InObject.SetFieldValue<Coral::Bool32>("BoolFieldTest", true);
-//		value = InObject.GetFieldValue<Coral::Bool32>("BoolFieldTest");
-//		return static_cast<bool>(value);
-//	});
-//	RegisterTest("StringFieldTest", [InObject]() mutable
-//	{
-//		Coral::ScopedString value = InObject.GetFieldValue<Coral::String>("StringFieldTest");
-//		if (value != "Hello")
-//			return false;
-//
-//		InObject.SetFieldValue("StringFieldTest", Coral::String::New("Hello, World!"));
-//		value = InObject.GetFieldValue<Coral::String>("StringFieldTest");
-//		return value == "Hello, World!";
-//	});
-//
-//	///// PROPERTIES ////
-//
-//	RegisterTest("SBytePropertyTest", [InObject]() mutable
-//	{
-//		auto value = InObject.GetPropertyValue<char8_t>("SBytePropertyTest");
-//		if (value != 10)
-//			return false;
-//		InObject.SetPropertyValue<char8_t>("SBytePropertyTest", 20);
-//		value = InObject.GetPropertyValue<char8_t>("SBytePropertyTest");
-//		return value == 20;
-//	});
-//
-//	RegisterTest("BytePropertyTest", [InObject]() mutable
-//	{
-//		auto value = InObject.GetPropertyValue<uint8_t>("BytePropertyTest");
-//		if (value != 10)
-//			return false;
-//		InObject.SetPropertyValue<uint8_t>("BytePropertyTest", 20);
-//		value = InObject.GetPropertyValue<uint8_t>("BytePropertyTest");
-//		return value == 20;
-//	});
-//
-//	RegisterTest("ShortPropertyTest", [InObject]() mutable
-//	{
-//		auto value = InObject.GetPropertyValue<int16_t>("ShortPropertyTest");
-//		if (value != 10)
-//			return false;
-//		InObject.SetPropertyValue<int16_t>("ShortPropertyTest", 20);
-//		value = InObject.GetPropertyValue<int16_t>("ShortPropertyTest");
-//		return value == 20;
-//	});
-//
-//	RegisterTest("UShortPropertyTest", [InObject]() mutable
-//	{
-//		auto value = InObject.GetPropertyValue<uint16_t>("UShortPropertyTest");
-//		if (value != 10)
-//			return false;
-//		InObject.SetPropertyValue<uint16_t>("UShortPropertyTest", 20);
-//		value = InObject.GetPropertyValue<uint16_t>("UShortPropertyTest");
-//		return value == 20;
-//	});
-//
-//	RegisterTest("IntPropertyTest", [InObject]() mutable
-//	{
-//		auto value = InObject.GetPropertyValue<int32_t>("IntPropertyTest");
-//		if (value != 10)
-//			return false;
-//		InObject.SetPropertyValue<int32_t>("IntPropertyTest", 20);
-//		value = InObject.GetPropertyValue<int32_t>("IntPropertyTest");
-//		return value == 20;
-//	});
-//
-//	RegisterTest("UIntPropertyTest", [InObject]() mutable
-//	{
-//		auto value = InObject.GetPropertyValue<uint32_t>("UIntPropertyTest");
-//		if (value != 10)
-//			return false;
-//		InObject.SetPropertyValue<uint32_t>("UIntPropertyTest", 20);
-//		value = InObject.GetPropertyValue<uint32_t>("UIntPropertyTest");
-//		return value == 20;
-//	});
-//
-//	RegisterTest("LongPropertyTest", [InObject]() mutable
-//	{
-//		auto value = InObject.GetPropertyValue<int64_t>("LongPropertyTest");
-//		if (value != 10)
-//			return false;
-//		InObject.SetPropertyValue<int64_t>("LongPropertyTest", 20);
-//		value = InObject.GetPropertyValue<int64_t>("LongPropertyTest");
-//		return value == 20;
-//	});
-//
-//	RegisterTest("ULongPropertyTest", [InObject]() mutable
-//	{
-//		auto value = InObject.GetPropertyValue<uint64_t>("ULongPropertyTest");
-//		if (value != 10)
-//			return false;
-//		InObject.SetPropertyValue<uint64_t>("ULongPropertyTest", 20);
-//		value = InObject.GetPropertyValue<uint64_t>("ULongPropertyTest");
-//		return value == 20;
-//	});
-//
-//	RegisterTest("FloatPropertyTest", [InObject]() mutable
-//	{
-//		auto value = InObject.GetPropertyValue<float>("FloatPropertyTest");
-//		if (value - 10.0f > 0.001f)
-//			return false;
-//		InObject.SetPropertyValue<float>("FloatPropertyTest", 20);
-//		value = InObject.GetPropertyValue<float>("FloatPropertyTest");
-//		return value - 20.0f < 0.001f;
-//	});
-//
-//	RegisterTest("DoublePropertyTest", [InObject]() mutable
-//	{
-//		auto value = InObject.GetPropertyValue<double>("DoublePropertyTest");
-//		if (value - 10.0 > 0.001)
-//			return false;
-//		InObject.SetPropertyValue<double>("DoublePropertyTest", 20);
-//		value = InObject.GetPropertyValue<double>("DoublePropertyTest");
-//		return value - 20.0 < 0.001;
-//	});
-//	
-//	RegisterTest("BoolPropertyTest", [InObject]() mutable
-//	{
-//		auto value = InObject.GetPropertyValue<Coral::Bool32>("BoolPropertyTest");
-//		if (value != false)
-//			return false;
-//		InObject.SetPropertyValue<Coral::Bool32>("BoolPropertyTest", true);
-//		value = InObject.GetPropertyValue<Coral::Bool32>("BoolPropertyTest");
-//		return static_cast<bool>(value);
-//	});
-//	RegisterTest("StringPropertyTest", [InObject]() mutable
-//	{
-//		Coral::ScopedString value = InObject.GetPropertyValue<Coral::String>("StringPropertyTest");
-//		if (value != "Hello")
-//			return false;
-//		InObject.SetPropertyValue("StringPropertyTest", Coral::String::New("Hello, World!"));
-//		value = InObject.GetPropertyValue<Coral::String>("StringPropertyTest");
-//		return value == "Hello, World!";
-//	});
-//}
 //
 //void RunTests()
 //{
@@ -413,6 +175,7 @@ int main(int argc, char** argv)
 	//fieldTestObject.SetFieldValue("DummyStructTest", ds);
 	//fieldTestObject.InvokeMethod("TestClassAndStruct");
 	//dummyClassInstance.Destroy();
+
 
 	//for (auto fieldInfo : fieldTestType.GetFields())
 	//{

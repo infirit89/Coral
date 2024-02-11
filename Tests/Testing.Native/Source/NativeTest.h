@@ -16,8 +16,12 @@ namespace Testing
 	class NativeTest : public testing::Test
 	{
 	protected:
-		NativeTest() = default;
+		NativeTest()
+		    : m_Assembly(*Globals::TestAssembly) { }
+
 		~NativeTest() override = default;
+
+		Coral::ManagedAssembly& m_Assembly;
 	};
 
 	TEST_F(NativeTest, ManagedStaticMethodTest)
@@ -33,13 +37,15 @@ namespace Testing
 		EXPECT_TRUE(testType.InvokeStaticMethod<bool>("StaticMethodTestTrue"));
 	}
 
-	TEST_F(NativeTest, ManagedTestsWithInternalCalls) 
+	TEST_F(NativeTest, ManagedInternalCallsTest)
 	{
 		bool succeeded = Globals::TestType.InvokeStaticMethod<bool>("RunManagedTests");
-		ASSERT_TRUE(succeeded);
+		EXPECT_TRUE(succeeded);
 	}
 
-	TEST_F(NativeTest, SByteTest)
+	TEST_F(NativeTest, IsTypeAssignableToTest) 
 	{
+		auto& fieldTestType = m_Assembly.GetType("Testing.Managed.FieldMarshalTest");
+		EXPECT_TRUE(fieldTestType.IsAssignableTo(fieldTestType));
 	}
 }

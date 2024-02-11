@@ -167,7 +167,6 @@ internal static class ManagedObject
 
 			CommonFree:
 			handle.Free();
-			Console.WriteLine("free");
 		}
 		catch (Exception ex)
 		{
@@ -479,6 +478,33 @@ internal static class ManagedObject
             HandleException(ex);
         }
     }
+
+	[UnmanagedCallersOnly]
+	internal static void GetStaticFieldValue(int InType, NativeString InFieldName, IntPtr OutValue) 
+	{
+		try
+		{
+            if (!TypeInterface.s_CachedTypes.TryGetValue(InType, out var type))
+            {
+                LogMessage($"Cannot get value of field {InFieldName} on a null type.", MessageLevel.Error);
+                return;
+            }
+
+			var fieldInfo = type!.GetField(InFieldName!, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static);
+
+            if (fieldInfo == null)
+            {
+                LogMessage($"Failed to find field '{InFieldName}' in type '{type!.FullName}'.", MessageLevel.Error);
+                return;
+            }
+
+			Marshalling.MarshalReturnValue(null, fieldInfo.GetValue(null), fieldInfo, OutValue);
+        }
+		catch (Exception ex) 
+		{
+			HandleException(ex);
+		}
+	}
 
 	[UnmanagedCallersOnly]
 	internal static void SetPropertyValue(IntPtr InTarget, NativeString InPropertyName, IntPtr InValue)

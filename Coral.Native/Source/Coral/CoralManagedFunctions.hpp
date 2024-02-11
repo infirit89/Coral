@@ -88,6 +88,7 @@ namespace Coral {
 	using SetFieldValueByFieldInfoFn = void (*)(void*, int, void*);
 	using GetFieldValueFn = void (*)(void*, String, void*);
 	using GetFieldValueByFieldInfoFn = void (*)(void*, int, void*);
+	using GetStaticFieldValueFn = void (*)(TypeId, String, void*);
 	using SetPropertyValueFn = void (*)(void*, String, void*);
 	using GetPropertyValueFn = void (*)(void*, String, void*);
 	using DestroyObjectFn = void (*)(void*);
@@ -173,6 +174,7 @@ namespace Coral {
 		SetFieldValueByFieldInfoFn SetFieldValueByFieldInfoFptr = nullptr;
 		GetFieldValueFn GetFieldValueFptr = nullptr;
 		GetFieldValueByFieldInfoFn GetFieldValueByFieldInfoFptr = nullptr;
+		GetStaticFieldValueFn GetStaticFieldValueFptr = nullptr;
 		SetPropertyValueFn SetPropertyValueFptr = nullptr;
 		GetPropertyValueFn GetPropertyValueFptr = nullptr;
 		DestroyObjectFn DestroyObjectFptr = nullptr;
