@@ -315,7 +315,7 @@ internal static class ManagedObject
 
 			var targetType = target.GetType();
 
-			var methodInfo = TryGetMethodInfo(targetType, InMethodName, InParameterTypes, InParameterCount, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+            var methodInfo = TryGetMethodInfo(targetType, InMethodName, InParameterTypes, InParameterCount, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
 			if (methodInfo == null)
 				return;
 

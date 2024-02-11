@@ -23,6 +23,8 @@
 #include "ObjectFieldMarshalTest.h"
 #include "ScalarPropertyMarshalTest.h"
 #include "ObjectPropertyMarshalTest.h"
+#include "ScalarMethodMarshalTest.h"
+#include "ObjectMethodMarshalTest.h"
 
 Coral::Type g_TestsType;
 

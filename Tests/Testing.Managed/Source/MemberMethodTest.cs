@@ -6,7 +6,6 @@ namespace Testing.Managed;
 
 public class MemberMethodTest
 {
-	
 	public struct DummyStruct
 	{
 		public int X;
@@ -14,85 +13,85 @@ public class MemberMethodTest
 		public int Z;
 	}
 	
-	public sbyte SByteTest(sbyte InValue)
+	public sbyte SByteMethodTest(sbyte InValue)
 	{
 		InValue *= 2;
 		return InValue;
 	}
 	
-	public byte ByteTest(byte InValue)
+	public byte ByteMethodTest(byte InValue)
 	{
 		InValue *= 2;
 		return InValue;
 	}
 	
-	public short ShortTest(short InValue)
+	public short ShortMethodTest(short InValue)
 	{
 		InValue *= 2;
 		return InValue;
 	}
 	
-	public ushort UShortTest(ushort InValue)
+	public ushort UShortMethodTest(ushort InValue)
 	{
 		InValue *= 2;
 		return InValue;
 	}
 	
-	public int IntTest(int InValue)
+	public int IntMethodTest(int InValue)
 	{
 		InValue *= 2;
 		return InValue;
 	}
 	
-	public uint UIntTest(uint InValue)
+	public uint UIntMethodTest(uint InValue)
 	{
 		InValue *= 2;
 		return InValue;
 	}
 	
-	public long LongTest(long InValue)
+	public long LongMethodTest(long InValue)
 	{
 		InValue *= 2;
 		return InValue;
 	}
 	
-	public ulong ULongTest(ulong InValue)
+	public ulong ULongMethodTest(ulong InValue)
 	{
 		InValue *= 2;
 		return InValue;
 	}
 	
-	public float FloatTest(float InValue)
+	public float FloatMethodTest(float InValue)
 	{
 		InValue *= 2.0f;
 		return InValue;
 	}
 	
-	public double DoubleTest(double InValue)
+	public double DoubleMethodTest(double InValue)
 	{
 		InValue *= 2.0;
 		return InValue;
 	}
 	
-	public bool BoolTest(bool InValue)
+	public bool BoolMethodTest(bool InValue)
 	{
 		InValue = !InValue;
 		return InValue;
 	}
 	
-	public IntPtr IntPtrTest(IntPtr InValue)
+	public IntPtr IntPtrMethodTest(IntPtr InValue)
 	{
 		Marshal.WriteInt32(InValue, 50);
 		return InValue;
 	}
 	
-	public string StringTest(string InValue)
+	public string StringMethodTest(string InValue)
 	{
 		InValue += ", World!";
 		return InValue;
 	}
 
-	public DummyStruct DummyStructTest(DummyStruct InValue)
+	public DummyStruct DummyStructMethodTest(DummyStruct InValue)
 	{
 		InValue.X *= 2;
 		InValue.Y *= 2.0f;
@@ -100,21 +99,21 @@ public class MemberMethodTest
 		return InValue;
 	}
 
-	public int OverloadTest(int InValue)
+	public int OverloadMethodTest(int InValue)
 	{
 		return InValue + 1000;
 	}
 
-	public float OverloadTest(float InValue)
+	public float OverloadMethodTest(float InValue)
 	{
 		return InValue + 10.0f;
 	}
 
-	public unsafe DummyStruct* DummyStructPtrTest(DummyStruct* InValue)
+	public unsafe DummyStruct* DummyStructPtrMethodTest(DummyStruct* InValue)
 	{
 		InValue->X *= 2;
 		InValue->Y *= 2.0f;
 		InValue->Z *= 2;
-		return InValue;
+        return InValue;
 	}
 }

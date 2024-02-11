@@ -39,7 +39,7 @@ namespace Coral {
 			return ManagedType::UInt;
 		else if constexpr (std::same_as<TArg, uint64_t> || (std::same_as<TArg, unsigned long> && sizeof(TArg) == 8))
 			return ManagedType::ULong;
-		else if constexpr (std::same_as<TArg, char8_t>)
+		else if constexpr (std::same_as<TArg, char8_t> || std::same_as<TArg, int8_t>)
 			return ManagedType::SByte;
 		else if constexpr (std::same_as<TArg, int16_t>)
 			return ManagedType::Short;

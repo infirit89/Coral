@@ -22,22 +22,18 @@ namespace Testing
 	class ScalarFieldMarshalTest : public FieldMarshalTestBase
 	{
 	protected:
-		ScalarFieldMarshalTest()
-		{
-		}
+		ScalarFieldMarshalTest() = default;
 
-		~ScalarFieldMarshalTest() override
-		{
-		}
+		~ScalarFieldMarshalTest() override = default;
 
-		static FieldData<T> m_FieldData;
+		static FieldData<T> s_FieldData;
 	};
 
 	TYPED_TEST_SUITE_P(ScalarFieldMarshalTest);
 
 	TYPED_TEST_P(ScalarFieldMarshalTest, FieldTest)
 	{
-		auto& fieldData = ScalarFieldMarshalTest<TypeParam>::m_FieldData;
+		auto& fieldData = ScalarFieldMarshalTest<TypeParam>::s_FieldData;
 		std::string_view fieldName = std::get<0>(fieldData);
 		auto fieldValues = std::get<1>(fieldData);
 		TypeParam oldValue = std::get<0>(fieldValues);
@@ -70,59 +66,59 @@ namespace Testing
 	INSTANTIATE_TYPED_TEST_SUITE_P(Member, ScalarFieldMarshalTest, FieldTypes);
 
 	template <>
-	FieldData<int8_t> ScalarFieldMarshalTest<int8_t>::m_FieldData 
+	FieldData<int8_t> ScalarFieldMarshalTest<int8_t>::s_FieldData 
 	{
 		"SByteFieldTest", { 10, 20 }
 	};
 	template <>
-	FieldData<uint8_t> ScalarFieldMarshalTest<uint8_t>::m_FieldData {
+	FieldData<uint8_t> ScalarFieldMarshalTest<uint8_t>::s_FieldData {
 		"ByteFieldTest", { 10, 20 }
 	};
 
 	template <>
-	FieldData<int16_t> ScalarFieldMarshalTest<int16_t>::m_FieldData {
+	FieldData<int16_t> ScalarFieldMarshalTest<int16_t>::s_FieldData {
 		"ShortFieldTest", { 10, 20 }
 	};
 	template <>
-	FieldData<uint16_t> ScalarFieldMarshalTest<uint16_t>::m_FieldData {
+	FieldData<uint16_t> ScalarFieldMarshalTest<uint16_t>::s_FieldData {
 		"UShortFieldTest", { 10, 20 }
 	};
 
 	template <>
-	FieldData<int32_t> ScalarFieldMarshalTest<int32_t>::m_FieldData {
+	FieldData<int32_t> ScalarFieldMarshalTest<int32_t>::s_FieldData {
 		"IntFieldTest", { 10, 20 }
 	};
 	template <>
-	FieldData<uint32_t> ScalarFieldMarshalTest<uint32_t>::m_FieldData {
+	FieldData<uint32_t> ScalarFieldMarshalTest<uint32_t>::s_FieldData {
 		"UIntFieldTest", { 10, 20 }
 	};
 
 	template <>
-	FieldData<int64_t> ScalarFieldMarshalTest<int64_t>::m_FieldData {
+	FieldData<int64_t> ScalarFieldMarshalTest<int64_t>::s_FieldData {
 		"LongFieldTest", { 10, 20 }
 	};
 	template <>
-	FieldData<uint64_t> ScalarFieldMarshalTest<uint64_t>::m_FieldData {
+	FieldData<uint64_t> ScalarFieldMarshalTest<uint64_t>::s_FieldData {
 		"ULongFieldTest", { 10, 20 }
 	};
 
 	template <>
-	FieldData<float> ScalarFieldMarshalTest<float>::m_FieldData 
+	FieldData<float> ScalarFieldMarshalTest<float>::s_FieldData 
 	{
 		"FloatFieldTest", { 10.0f, 20.0f }
 	};
 	template <>
-	FieldData<double> ScalarFieldMarshalTest<double>::m_FieldData {
+	FieldData<double> ScalarFieldMarshalTest<double>::s_FieldData {
 		"DoubleFieldTest", { 10.0, 20.0 }
 	};
 
 	template <>
-	FieldData<bool> ScalarFieldMarshalTest<bool>::m_FieldData {
+	FieldData<bool> ScalarFieldMarshalTest<bool>::s_FieldData {
 		"BoolFieldTest", { false, true }
 	};
 
 	template <>
-	FieldData<FieldDummyStruct> ScalarFieldMarshalTest<FieldDummyStruct>::m_FieldData {
+	FieldData<FieldDummyStruct> ScalarFieldMarshalTest<FieldDummyStruct>::s_FieldData {
 		"DummyStructFieldTest", { { 0.0f }, { 50.0f } }
 	};
 }

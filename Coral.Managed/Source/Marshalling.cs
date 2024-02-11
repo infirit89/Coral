@@ -78,17 +78,7 @@ public static class Marshalling
 		{
 			Marshal.StructureToPtr(nativeString, OutValue, false);
 		}
-		else if (type.IsClass) 
-		{
-			var handle = GCHandle.Alloc(InValue, GCHandleType.Normal);
-			AssemblyLoader.RegisterHandle(type.Assembly, handle);
-			unsafe
-			{
-				ObjectContainer* container = (ObjectContainer*)OutValue;
-				(*container).Handle = GCHandle.ToIntPtr(handle);
-			}
-		}
-		else if (type.IsPointer)
+		else if (type.IsPointer)		// what happens if type is a pointer to a class?
 		{
 			unsafe
 			{
@@ -103,7 +93,17 @@ public static class Marshalling
 				}
 			}
 		}
-		else
+        else if (type.IsClass)
+        {
+            var handle = GCHandle.Alloc(InValue, GCHandleType.Normal);
+            AssemblyLoader.RegisterHandle(type.Assembly, handle);
+            unsafe
+            {
+                ObjectContainer* container = (ObjectContainer*)OutValue;
+                (*container).Handle = GCHandle.ToIntPtr(handle);
+            }
+        }
+        else
 		{
 			int valueSize = type.IsEnum ? Marshal.SizeOf(Enum.GetUnderlyingType(type)) : Marshal.SizeOf(type);
 			var handle = GCHandle.Alloc(InValue, GCHandleType.Pinned);
