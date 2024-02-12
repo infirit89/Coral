@@ -2,7 +2,6 @@
 
 using System;
 using System.Linq;
-using System.Net.Http.Headers;
 using System.Reflection;
 using System.Reflection.Metadata.Ecma335;
 using System.Runtime.InteropServices;
@@ -307,7 +306,17 @@ public static class Marshalling
 				}
 			}
 		}
-		else
+        else if (type.IsClass)
+        {
+            var handle = GCHandle.Alloc(InValue, GCHandleType.Normal);
+            AssemblyLoader.RegisterHandle(type.Assembly, handle);
+            unsafe
+            {
+                ObjectContainer* container = (ObjectContainer*)OutValue;
+                (*container).Handle = GCHandle.ToIntPtr(handle);
+            }
+        }
+        else
 		{
 			int valueSize = type.IsEnum ? Marshal.SizeOf(Enum.GetUnderlyingType(type)) : Marshal.SizeOf(type);
 			var handle = GCHandle.Alloc(InValue, GCHandleType.Pinned);

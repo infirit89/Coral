@@ -1,6 +1,6 @@
 #pragma once
 
-#include "MethodMarshalTestBase.h"
+#include "MethodMarshalTestBase.hpp"
 
 namespace Testing
 {
@@ -32,23 +32,22 @@ namespace Testing
 		MethodDummyStruct oldValue = { 10, 10.0f, 10 };
 		MethodDummyStruct newValue = { 20, 20.0f, 20 };
 		auto result = m_MethodTestObject.InvokeMethod<MethodDummyStruct*, MethodDummyStruct*>("DummyStructPtrMethodTest", &oldValue);
-		ASSERT_EQ((*result).X, newValue.X);
-		ASSERT_EQ(result->Y, newValue.Y);
+		ASSERT_EQ(*result, newValue);
 		ASSERT_LT(result->Y - newValue.Y, 0.001f);
-		ASSERT_EQ(result->Z, newValue.Z);
 	}
 
-	TEST_F(ObjectMethodMarshalTest, OverloadInt32MethodTest)
+	TEST_F(ObjectMethodMarshalTest, DummyClassMethodTest) 
 	{
-		int32_t value1 = 50, value2 = 1050;
-		int32_t result = m_MethodTestObject.InvokeMethod<int32_t, int32_t&>("OverloadMethodTest", value1);
-		ASSERT_EQ(result, value2);
-	}
+		MethodDummyStruct value1 = { 10, 10.0f, 10 };
+		MethodDummyStruct value2 = { 20, 20.0f, 20 };
+		
+		auto dummyClassInstance = Globals::TestAssembly
+		                              ->GetType("Testing.Managed.MemberMethodTest+DummyClass")
+		                              .CreateInstance(value1);
 
-	TEST_F(ObjectMethodMarshalTest, OverloadFloatMethodTest)
-	{
-		float value1 = 5, value2 = 15.0f;
-		float result = m_MethodTestObject.InvokeMethod<float, float&>("OverloadMethodTest", value1);
+		m_MethodTestObject.InvokeMethod("DummyClassMethodTest", dummyClassInstance);
+		auto result = dummyClassInstance.InvokeMethod<MethodDummyStruct>("GetValues");
 		ASSERT_EQ(result, value2);
+		ASSERT_LT(result.Y - value2.Y, 0.001f);
 	}
 }

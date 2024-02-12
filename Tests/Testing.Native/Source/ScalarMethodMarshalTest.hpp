@@ -1,6 +1,6 @@
 #pragma once
 
-#include "MethodMarshalTestBase.h"
+#include "MethodMarshalTestBase.hpp"
 
 namespace Testing {
 

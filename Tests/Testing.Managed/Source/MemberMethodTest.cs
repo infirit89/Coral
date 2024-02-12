@@ -12,6 +12,25 @@ public class MemberMethodTest
 		public float Y;
 		public int Z;
 	}
+
+	public class DummyClass 
+	{
+		public DummyClass(DummyStruct value) 
+		{
+			X = value.X;
+			Y = value.Y;
+			Z = value.Z;
+		}
+
+		public DummyStruct GetValues() 
+		{
+			return new() { X = X, Y = Y, Z = Z };
+		}
+
+		public int X;
+		public float Y;
+		public int Z;
+	}
 	
 	public sbyte SByteMethodTest(sbyte InValue)
 	{
@@ -116,4 +135,11 @@ public class MemberMethodTest
 		InValue->Z *= 2;
         return InValue;
 	}
+
+	public void DummyClassMethodTest(DummyClass InValue) 
+	{
+        InValue.X *= 2;
+        InValue.Y *= 2.0f;
+        InValue.Z *= 2;
+    }
 }

@@ -13,7 +13,7 @@
 #include <Coral/String.hpp>
 #include <Coral/Array.hpp>
 
-#include "Globals.h"
+#include "Globals.hpp"
 
 namespace Testing
 {

@@ -1,4 +1,4 @@
-#include "Globals.h"
+#include "Globals.hpp"
 
 namespace Testing
 {
@@ -7,4 +7,6 @@ namespace Testing
 	Coral::AssemblyLoadContext Globals::AssemblyLoadContext;
 	Coral::ManagedObject Globals::TestInstance;
 	Coral::Type Globals::TestType;
+	Coral::HostSettings Globals::HostSettings;
+	std::filesystem::path Globals::AssemblyPath;
 }

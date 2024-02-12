@@ -157,8 +157,10 @@ public static class ArrayStorage
 
 			if(InTarget != null)
 				AssemblyLoader.RegisterHandle(InTarget.GetType().Assembly, arrayHandle);
-
-			s_FieldArrays[arrayId] = arrayHandle;
+			else
+                AssemblyLoader.RegisterHandle(Assembly.GetExecutingAssembly(), arrayHandle);
+            
+            s_FieldArrays[arrayId] = arrayHandle;
 		}
 
 		return arrayHandle;

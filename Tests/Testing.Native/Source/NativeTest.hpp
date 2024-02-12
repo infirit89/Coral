@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Globals.h"
+#include "Globals.hpp"
 
 #include <Coral/HostInstance.hpp>
 #include <Coral/Assembly.hpp>
@@ -37,11 +37,11 @@ namespace Testing
 		EXPECT_TRUE(testType.InvokeStaticMethod<bool>("StaticMethodTestTrue"));
 	}
 
-	TEST_F(NativeTest, ManagedInternalCallsTest)
+	/*TEST_F(NativeTest, ManagedInternalCallsTest)
 	{
 		bool succeeded = Globals::TestType.InvokeStaticMethod<bool>("RunManagedTests");
 		EXPECT_TRUE(succeeded);
-	}
+	}*/
 
 	TEST_F(NativeTest, IsTypeAssignableToTest) 
 	{

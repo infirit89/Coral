@@ -45,21 +45,10 @@ namespace Testing.Managed
 
     internal class TestUtils
     {
-        public static bool RunManagedTests()
+        public static TestContainer[] CollectTests()
         {
-            CollectTests();
+            List<TestContainer> tests = new List<TestContainer>();
 
-            foreach (var test in s_Tests)
-                test.Run();
-
-            Console.WriteLine($"[Test]: Done. {s_PassedTests} passed, {s_Tests.Count - s_PassedTests} failed.");
-            return s_Tests.Count - s_PassedTests == 0;
-        }
-
-        // NOTE: maybe pass all the tests to c++?
-        //		 and let gtest handle the verification?
-        private static void CollectTests()
-        {
             var types = Assembly.GetExecutingAssembly()
                                 .GetTypes()
                                 .Where(
@@ -75,7 +64,7 @@ namespace Testing.Managed
 
                 foreach (var method in methods) 
                 {
-                    s_Tests.Add(new TestContainer($"{type.FullName}.{method.Name}", s_Tests.Count + 1, () => 
+                    tests.Add(new TestContainer($"{type.FullName}.{method.Name}", () => 
                     {
                         try
                         {
@@ -89,54 +78,33 @@ namespace Testing.Managed
                 }
             }
 
+            return tests.ToArray();
         }
 
-        private class TestContainer
+        internal class TestContainer
         {
-            private readonly string m_Name;
-            private readonly int m_TestIndex;
+            public readonly string Name;
             private readonly Action m_Func;
 
-            internal TestContainer(string InName, int InTestIndex, Action InFunction)
+            internal TestContainer(string InName, Action InFunction)
             {
-                m_Name = InName;
-                m_TestIndex = InTestIndex;
+                Name = InName;
                 m_Func = InFunction;
             }
 
-            public void Run()
+            public bool Run()
             {
                 try
                 {
                     m_Func();
-                    Succeeded();
+                    return true;
                 }
                 catch (AssertException) 
                 {
-                    Failed();
+                    return false;
                 }
             }
-
-            private void Succeeded() 
-            {
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine($"[{m_TestIndex} / {s_Tests.Count} ({m_Name})]: Passed");
-                Console.ForegroundColor = ConsoleColor.White;
-                Console.Write("");
-                s_PassedTests++;
-            }
-
-            private void Failed() 
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine($"[{m_TestIndex} / {s_Tests.Count} ({m_Name})]: Failed");
-                Console.ForegroundColor = ConsoleColor.White;
-                Console.Write("");
-            }
         }
-
-        private static List<TestContainer> s_Tests = new List<TestContainer>();
-        private static int s_PassedTests = 0;
     }
 
 

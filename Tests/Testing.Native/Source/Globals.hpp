@@ -22,5 +22,7 @@ namespace Testing
 		static Coral::AssemblyLoadContext AssemblyLoadContext;
 		static Coral::ManagedObject TestInstance;
 		static Coral::Type TestType;
+		static Coral::HostSettings HostSettings;
+		static std::filesystem::path AssemblyPath;
 	};
 }
