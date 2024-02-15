@@ -26,8 +26,8 @@
 #include "ScalarMethodMarshalTest.hpp"
 #include "ObjectMethodMarshalTest.hpp"
 #include "InternalCallsTest.hpp"
-
-Coral::Type g_TestsType;
+#include "TypeTest.hpp"
+#include "ManagedArrayTest.hpp"
 
 void ExceptionCallback(std::string_view InMessage)
 {
@@ -51,7 +51,7 @@ int main(int argc, char** argv)
 		.CoralDirectory = exeDir.string(),
 		.ExceptionCallback = ExceptionCallback
 	};
-	
+
 	Globals::HostInstance.Initialize(Globals::HostSettings);
 
 	Globals::AssemblyLoadContext = Globals::HostInstance.CreateAssemblyLoadContext("TestContext");

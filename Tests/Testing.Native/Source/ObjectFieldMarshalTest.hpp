@@ -30,7 +30,9 @@ namespace Testing
 		constexpr float value = 500.0f;
 		dummyClassInstance.SetFieldValue<float>("X", value);
 		m_FieldTestObject.SetFieldValue("DummyClassFieldTest", dummyClassInstance);
+		dummyClassInstance.Destroy();
 		dummyClassInstance = m_FieldTestObject.GetFieldValue<Coral::ManagedObject>("DummyClassFieldTest");
 		ASSERT_EQ(dummyClassInstance.GetFieldValue<float>("X"), value);
+		dummyClassInstance.Destroy();
 	}
 }

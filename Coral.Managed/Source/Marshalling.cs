@@ -282,7 +282,14 @@ public static class Marshalling
                 Marshal.WriteIntPtr(OutValue, IntPtr.Zero);
             }
         }
-		else if (InValue is string str)
+        else if (InValue is bool)
+        {
+            unsafe
+            {
+                *(bool*)OutValue = (bool)InValue;
+            }
+        }
+        else if (InValue is string str)
 		{
 			NativeString nativeString = str;
 			Marshal.StructureToPtr(nativeString, OutValue, false);

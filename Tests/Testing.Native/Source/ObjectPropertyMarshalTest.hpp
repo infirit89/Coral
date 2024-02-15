@@ -32,8 +32,10 @@ namespace Testing
 		dummyClassInstance.SetFieldValue<float>("X", valueF);
 		dummyClassInstance.SetFieldValue<bool>("Y", valueB);
 		m_PropertyTestObject.SetPropertyValue("DummyClassPropertyTest", dummyClassInstance);
+		dummyClassInstance.Destroy();
 		dummyClassInstance = m_PropertyTestObject.GetPropertyValue<Coral::ManagedObject>("DummyClassPropertyTest");
 		ASSERT_EQ(dummyClassInstance.GetFieldValue<float>("X"), valueF);
 		ASSERT_EQ(dummyClassInstance.GetFieldValue<bool>("Y"), valueB);
+		dummyClassInstance.Destroy();
 	}
 }

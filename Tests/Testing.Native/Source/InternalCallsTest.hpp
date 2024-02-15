@@ -51,5 +51,6 @@ namespace Testing
 
 			testObject.Destroy();
 		}
+		tests.Destroy();
 	}
 }

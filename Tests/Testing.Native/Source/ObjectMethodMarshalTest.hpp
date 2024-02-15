@@ -49,5 +49,6 @@ namespace Testing
 		auto result = dummyClassInstance.InvokeMethod<MethodDummyStruct>("GetValues");
 		ASSERT_EQ(result, value2);
 		ASSERT_LT(result.Y - value2.Y, 0.001f);
+		dummyClassInstance.Destroy();
 	}
 }

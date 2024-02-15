@@ -34,9 +34,27 @@ internal static class ManagedArray
             
             Array result = Array.CreateInstance(type!, lengths.ToArray());
             var handle = GCHandle.Alloc(result, GCHandleType.Normal);
-            AssemblyLoader.RegisterHandle(type!.Assembly, handle);
+
+            int typeAssemblyId = type!.Assembly.GetName().Name!.GetHashCode();
+            if (!AssemblyLoader.TryGetAssembly(typeAssemblyId, out var assembly))
+                assembly = Assembly.GetExecutingAssembly();
+            
+            AssemblyLoader.RegisterHandle(assembly!, handle);
             (*OutArray).Data = GCHandle.ToIntPtr(handle);
             (*OutArray).Length = result.Rank;
+        }
+        catch (Exception ex) 
+        {
+            HandleException(ex);
+        }
+    }
+
+    [UnmanagedCallersOnly]
+    internal static void DestroyObject(IntPtr InArrayHandle) 
+    {
+        try
+        {
+            GCHandle.FromIntPtr(InArrayHandle).Free();
         }
         catch (Exception ex) 
         {

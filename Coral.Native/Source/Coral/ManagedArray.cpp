@@ -18,6 +18,17 @@ namespace Coral {
 		return array;
 	}
 
+	void ManagedArray::Destroy()
+	{
+		if (!m_Handle)
+			return;
+
+		s_ManagedFunctions.DestroyObjectFptr(m_Handle);
+		m_Handle = nullptr;
+		m_Rank = 0;
+		m_Type = nullptr;
+	}
+
 	int32_t ManagedArray::GetLength(int32_t InDimension) 
 	{
 		return s_ManagedFunctions.GetArrayLengthFptr(m_Handle, InDimension);

@@ -17,27 +17,4 @@ namespace Testing.Managed {
 			return X * 10.0f;
 		}
 	}
-
-	public class Tests
-	{
-		public static float StaticMethodTest(float value)
-		{
-			return value;
-		}
-
-		public static int StaticMethodTest(int value)
-		{
-			return value;
-		}
-
-		public static bool StaticMethodTestFalse()
-		{
-			return false;
-		}
-		public static bool StaticMethodTestTrue() 
-		{
-			return true;
-		}
-	}
-
 }

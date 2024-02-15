@@ -169,7 +169,9 @@ internal static class TypeInterface
                 typeof(double),
 
                 typeof(char),
-                typeof(bool)
+                typeof(bool),
+
+				typeof(string)
             };
 
 			if (OutTypeCount != null)
