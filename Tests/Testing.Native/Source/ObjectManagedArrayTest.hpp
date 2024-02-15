@@ -44,5 +44,6 @@ namespace Testing
 	{
 		auto& dummClassItemType = Globals::TestAssembly->GetType("Testing.Managed.DummyClassItem");
 
+
 	}
 }

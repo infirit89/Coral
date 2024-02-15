@@ -43,76 +43,7 @@ public static class Marshalling
 		if (type == null)
 			return;
 
-		if (type.IsArray)
-		{
-			var fieldArray = ArrayStorage.GetFieldArray(InTarget, InValue, InMemberInfo);
-
-			if (fieldArray != null)
-			{
-				unsafe
-				{
-					ArrayContainer* container = (ArrayContainer*)OutValue;
-					(*container).Data = GCHandle.ToIntPtr(fieldArray.Value);
-					(*container).Length = (fieldArray.Value.Target as Array)!.Rank;
-				}
-			}
-			else
-			{
-				Marshal.WriteIntPtr(OutValue, IntPtr.Zero);
-			}
-		}
-		else if (InValue is bool)
-		{
-			unsafe
-			{
-				*(bool*)OutValue = (bool)InValue;
-			}
-		}
-		else if (InValue is string str)
-		{
-			NativeString nativeString = str;
-			Marshal.StructureToPtr(nativeString, OutValue, false);
-		}
-		else if (InValue is NativeString nativeString)
-		{
-			Marshal.StructureToPtr(nativeString, OutValue, false);
-		}
-		else if (type.IsPointer)		// what happens if type is a pointer to a class?
-		{
-			unsafe
-			{
-				if (InValue == null)
-				{
-					Marshal.WriteIntPtr(OutValue, IntPtr.Zero);
-				}
-				else
-				{
-					void* valuePointer = Pointer.Unbox(InValue);
-					Buffer.MemoryCopy(&valuePointer, OutValue.ToPointer(), IntPtr.Size, IntPtr.Size);
-				}
-			}
-		}
-        else if (type.IsClass)
-        {
-            var handle = GCHandle.Alloc(InValue, GCHandleType.Normal);
-            AssemblyLoader.RegisterHandle(type.Assembly, handle);
-            unsafe
-            {
-                ObjectContainer* container = (ObjectContainer*)OutValue;
-                (*container).Handle = GCHandle.ToIntPtr(handle);
-            }
-        }
-        else
-		{
-			int valueSize = type.IsEnum ? Marshal.SizeOf(Enum.GetUnderlyingType(type)) : Marshal.SizeOf(type);
-			var handle = GCHandle.Alloc(InValue, GCHandleType.Pinned);
-			unsafe
-			{
-				Buffer.MemoryCopy(handle.AddrOfPinnedObject().ToPointer(), OutValue.ToPointer(), valueSize, valueSize);
-			}
-
-			handle.Free();
-		}
+		MarshalObject(InTarget, InValue, type, OutValue, InMemberInfo);
 	}
 
 	private struct ArrayObject
@@ -258,15 +189,16 @@ public static class Marshalling
 		return Marshal.PtrToStructure(InValue, InType);	
 	}
 
-	public static void MarshalObject(object? InTarget, object? InValue, Type InType, IntPtr OutValue)
+	public static void MarshalObject(object? InTarget, object? InValue, Type InType, IntPtr OutValue, MemberInfo? InMemberInfo = null)
 	{
 		if (InValue == null)
 			return;
 
 		Type type = InType;
-		if (type.IsArray) 
+
+		if (type.IsArray)
 		{
-            var fieldArray = ArrayStorage.GetFieldArray(InTarget, InValue, null);
+			var fieldArray = ArrayStorage.GetFieldArray(InTarget, InValue, InMemberInfo);
 
             if (fieldArray != null)
             {
@@ -298,7 +230,7 @@ public static class Marshalling
 		{
 			Marshal.StructureToPtr(nativeString, OutValue, false);
 		}
-		else if (type.IsPointer)
+		else if (type.IsPointer)		// what happens if type is a pointer to a class?
 		{
 			unsafe
 			{
@@ -327,7 +259,6 @@ public static class Marshalling
 		{
 			int valueSize = type.IsEnum ? Marshal.SizeOf(Enum.GetUnderlyingType(type)) : Marshal.SizeOf(type);
 			var handle = GCHandle.Alloc(InValue, GCHandleType.Pinned);
-
 			unsafe
 			{
 				Buffer.MemoryCopy(handle.AddrOfPinnedObject().ToPointer(), OutValue.ToPointer(), valueSize, valueSize);
