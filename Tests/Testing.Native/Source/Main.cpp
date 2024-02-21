@@ -28,6 +28,7 @@
 #include "InternalCallsTest.hpp"
 #include "TypeTest.hpp"
 #include "ManagedArrayTest.hpp"
+#include "ObjectManagedArrayTest.hpp"
 
 void ExceptionCallback(std::string_view InMessage)
 {

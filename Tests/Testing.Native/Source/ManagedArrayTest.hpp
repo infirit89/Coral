@@ -25,9 +25,15 @@ namespace Testing
 	class ManagedArrayTest : public testing::Test
 	{
 	protected:
-		ManagedArrayTest() = default;
+		ManagedArrayTest() 
+		{
+			m_Type = Globals::TestAssembly->GetType(std::get<0>(s_ArrayData));
+			m_Values = std::get<1>(s_ArrayData);
+		}
 		~ManagedArrayTest() override = default;
 
+		Coral::Type m_Type;
+		std::vector<T> m_Values;
 		static ArrayData<T> s_ArrayData;
 	};
 
@@ -35,23 +41,37 @@ namespace Testing
 
 	TYPED_TEST_P(ManagedArrayTest, ArrayTest)
 	{
-		auto& arrayData = ManagedArrayTest<TypeParam>::s_ArrayData;
-		std::string_view typeName = std::get<0>(arrayData);
-		std::vector<TypeParam> values = std::get<1>(arrayData);
-
-		auto& type = Globals::TestAssembly->GetType(typeName);
-		Coral::ManagedArray arr = Coral::ManagedArray::New(type, values.size());
+		Coral::ManagedArray arr = Coral::ManagedArray::New(this->m_Type, this->m_Values.size());
 		
 		for (int32_t i = 0; i < arr.GetLength(0); i++)
 		{
-			arr.SetValue<TypeParam>(i, values.at(i));
+			arr.SetValue<TypeParam>(i, this->m_Values.at(i));
 			TypeParam result = arr.GetValue<TypeParam>(i);
-			ASSERT_EQ(result, values.at(i));
+			ASSERT_EQ(result, this->m_Values.at(i));
 		}
 		arr.Destroy();
 	}
 
-	REGISTER_TYPED_TEST_SUITE_P(ManagedArrayTest, ArrayTest);
+	TYPED_TEST_P(ManagedArrayTest, ResizeRankOneArrayTest) 
+	{
+		Coral::ManagedArray arr = Coral::ManagedArray::New(this->m_Type, this->m_Values.size() - 3);
+
+		for (int32_t i = 0; i < arr.GetLength(0); i++)
+			arr.SetValue<TypeParam>(i, this->m_Values.at(i));
+
+		arr.Resize(this->m_Values.size());
+
+		for (int32_t i = this->m_Values.size() - 2; i < arr.GetLength(0); i++)
+		{
+			arr.SetValue<TypeParam>(i, this->m_Values.at(i));
+			TypeParam result = arr.GetValue<TypeParam>(i);
+			ASSERT_EQ(result, this->m_Values.at(i));
+		}
+
+		arr.Destroy();
+	}
+
+	REGISTER_TYPED_TEST_SUITE_P(ManagedArrayTest, ArrayTest, ResizeRankOneArrayTest);
 
 	using ArrayTypes = ::testing::Types<int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t, int64_t, uint64_t, float, double, bool, DummyStructItem>;
 	INSTANTIATE_TYPED_TEST_SUITE_P(Member, ManagedArrayTest, ArrayTypes);

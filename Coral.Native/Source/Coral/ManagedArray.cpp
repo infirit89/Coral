@@ -46,9 +46,11 @@ namespace Coral {
 
 		Coral::ManagedArray temp = Coral::ManagedArray::New(GetType().GetElementType(), InNewSize);
 		memcpy(temp.Data(), Data(), std::min(InNewSize, GetLength(0)) * GetType().GetElementType().GetSize());
+
+		Destroy();
 		*this = temp;
 	}
-
+		
 	void ManagedArray::GetValueRaw(int32_t InIndex, void* OutValue)
 	{
 		constexpr size_t indicesSize = 1;

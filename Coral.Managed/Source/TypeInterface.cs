@@ -310,7 +310,10 @@ internal static class TypeInterface
 			if (!s_CachedTypes.TryGetValue(InType, out var type))
 				return -1;
 
-			return Marshal.SizeOf(type!);
+			if(type!.IsValueType)
+				return Marshal.SizeOf(type!);
+
+			return IntPtr.Size;
 		}
 		catch (Exception e)
 		{
