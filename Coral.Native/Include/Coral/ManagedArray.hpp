@@ -18,6 +18,7 @@ namespace Coral {
 
 		// NOTE: only for sz arrays
 		void Resize(int32_t InNewSize);
+		void Resize(const int32_t* InLengths, size_t InLengthsSize);
 
 		void GetValueRaw(int32_t InIndex, void* OutValue);
 		void GetValueRaw(const int32_t* InIndices, size_t InIndicesSize, void* OutValue);

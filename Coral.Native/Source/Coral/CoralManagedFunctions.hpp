@@ -76,6 +76,7 @@ namespace Coral {
 	using GetArrayValueFn = void (*)(void*, const int32_t*, int32_t, void*);
 	using SetArrayValueFn = void (*)(void*, const int32_t*, int32_t, void*);
 	using GetArrayDataReferenceFn = void* (*)(void*);
+	using ResizeRankOneArrayFn = void (*)(int32_t, ManagedArray*);
 #pragma endregion
 
 	using CreateObjectFn = void* (*)(TypeId, Bool32, const void**, const ManagedType*, int32_t);
@@ -161,6 +162,7 @@ namespace Coral {
 		GetArrayValueFn GetArrayValueFptr = nullptr;
 		SetArrayValueFn SetArrayValueFptr = nullptr;
 		GetArrayDataReferenceFn GetArrayDataReferenceFptr = nullptr;
+		ResizeRankOneArrayFn ResizeRankOneArrayFptr = nullptr;
 #pragma endregion
 
 		CreateObjectFn CreateObjectFptr = nullptr;

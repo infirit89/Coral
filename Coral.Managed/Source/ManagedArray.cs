@@ -132,7 +132,6 @@ internal static class ManagedArray
             }
 
             var indices = new NativeArray<int>(InIndices, InIndicesCount);
-            Console.WriteLine(target.GetType());
             object? value = Marshalling.MarshalPointer(InValue, target.GetType().GetElementType()!);
             target.SetValue(value, indices);
         }
@@ -153,6 +152,7 @@ internal static class ManagedArray
                 LogMessage($"Cannot get the data reference of an array with handle {InArrayHandle}. Target was null.", MessageLevel.Error);
                 return IntPtr.Zero;
             }
+            Array.Copy()
 
             return (IntPtr)Unsafe.AsPointer(ref MemoryMarshal.GetArrayDataReference(target));
         }
@@ -160,6 +160,72 @@ internal static class ManagedArray
         {
             HandleException(ex);
             return IntPtr.Zero;
+        }
+    }
+
+    [UnmanagedCallersOnly]
+    public static unsafe void ResizeRankOne(int InNewSize, Marshalling.ArrayContainer* InContainer) 
+    {
+        try
+        {
+            GCHandle handle = GCHandle.FromIntPtr((*InContainer).Data);
+            var target = handle.Target as Array;
+            if (target == null) 
+            {
+                LogMessage($"Cannot resize an array with handle {(*InContainer).Data}. Target was null.", MessageLevel.Error);
+                return;
+            }
+
+            if (target.Rank > 1) 
+            {
+                LogMessage($"Method ResizeRankOne cannot resize an array with a rank bigger than one for handle {(*InContainer).Data}.", MessageLevel.Error);
+                return;
+            }
+
+            if (InNewSize < 0) 
+            {
+                LogMessage($"Invalid size argument: {InNewSize}.", MessageLevel.Error);
+                return;
+            }
+
+            if (target.Length == InNewSize)
+                return;
+
+            Type elementType = target.GetType().GetElementType()!;
+            Array temp = Array.CreateInstance(elementType, InNewSize);
+            Buffer.MemoryCopy(
+                Unsafe.AsPointer(ref MemoryMarshal.GetArrayDataReference(target)),
+                Unsafe.AsPointer(ref MemoryMarshal.GetArrayDataReference(temp)),
+                temp.Length * elementType.GetSize(),
+                Math.Min(InNewSize, target.Length) * elementType.GetSize());
+
+            handle.Target = temp;
+        }
+        catch (Exception ex)
+        {
+            HandleException(ex);
+        }
+    }
+
+    [UnmanagedCallersOnly]
+    public static unsafe void ResizeRankN(IntPtr InLengths, int InLengthsCount, Marshalling.ArrayContainer* InContainer) 
+    {
+        try
+        {
+            GCHandle handle = GCHandle.FromIntPtr((*InContainer).Data);
+            var target = handle.Target as Array;
+            if (target == null)
+            {
+                LogMessage($"Cannot resize an array with handle {(*InContainer).Data}. Target was null.", MessageLevel.Error);
+                return;
+            }
+
+            var lengths = new NativeArray<int>(InLengths, InLengthsCount);
+            handle.Target = target.Resize(lengths);
+        }
+        catch (Exception ex)
+        {
+            HandleException(ex);
         }
     }
 }
