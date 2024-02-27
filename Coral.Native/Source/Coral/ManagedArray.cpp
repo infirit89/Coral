@@ -46,7 +46,7 @@ namespace Coral {
 
 	void ManagedArray::Resize(const int32_t* InLengths, size_t InLengthsSize)
 	{
-
+		s_ManagedFunctions.ResizeRankNArrayFptr(InLengths, InLengthsSize, this);
 	}
 		
 	void ManagedArray::GetValueRaw(int32_t InIndex, void* OutValue)

@@ -152,8 +152,7 @@ internal static class ManagedArray
                 LogMessage($"Cannot get the data reference of an array with handle {InArrayHandle}. Target was null.", MessageLevel.Error);
                 return IntPtr.Zero;
             }
-            Array.Copy()
-
+            
             return (IntPtr)Unsafe.AsPointer(ref MemoryMarshal.GetArrayDataReference(target));
         }
         catch (Exception ex) 

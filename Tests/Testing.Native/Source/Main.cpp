@@ -27,8 +27,9 @@
 #include "ObjectMethodMarshalTest.hpp"
 #include "InternalCallsTest.hpp"
 #include "TypeTest.hpp"
-#include "ManagedArrayTest.hpp"
+#include "ScalarManagedArrayTest.hpp"
 #include "ObjectManagedArrayTest.hpp"
+#include "RankNManagedArrayTest.hpp"
 
 void ExceptionCallback(std::string_view InMessage)
 {

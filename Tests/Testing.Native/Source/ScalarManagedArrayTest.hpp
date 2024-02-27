@@ -1,23 +1,13 @@
 #pragma once
 
 #include "Globals.hpp"
+#include "ManagedArrayTestCommon.hpp"
 #include <Coral/ManagedArray.hpp>
 
 #include <gtest/gtest.h>
 
 namespace Testing 
 {
-	struct DummyStructItem 
-	{
-		bool operator==(const DummyStructItem& other) const 
-		{
-			return TestInt == other.TestInt && TestFloat == other.TestFloat;
-		}
-
-		int TestInt;
-		float TestFloat;
-	};
-
 	template <typename T>
 	using ArrayData = std::tuple<std::string_view, std::vector<T>>;
 
