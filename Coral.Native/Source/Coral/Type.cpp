@@ -118,6 +118,11 @@ namespace Coral {
 		return s_ManagedFunctions.IsTypeSZArrayFptr(m_Id);
 	}
 
+	bool Type::IsArray() const
+	{
+		return s_ManagedFunctions.IsTypeArrayFptr(m_Id);
+	}
+
 	Type& Type::GetElementType()
 	{
 		if (!m_ElementType)

@@ -396,6 +396,18 @@ internal static class TypeInterface
 	}
 
 	[UnmanagedCallersOnly]
+	internal static unsafe Bool32 IsTypeArray(int InTypeID) 
+	{
+		if (!s_CachedTypes.TryGetValue(InTypeID, out var type))
+			return false;
+
+		if (type == null)
+			return false;
+
+		return type.IsArray;
+	}
+
+	[UnmanagedCallersOnly]
 	internal static unsafe void GetElementType(int InTypeID, int* OutElementTypeID)
 	{
 		try

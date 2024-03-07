@@ -33,6 +33,7 @@ namespace Coral {
 	using IsTypeAssignableToFn = Bool32 (*)(TypeId, TypeId);
 	using IsTypeAssignableFromFn = Bool32 (*)(TypeId, TypeId);
 	using IsTypeSZArrayFn = Bool32 (*)(TypeId);
+	using IsTypeArrayFn = Bool32 (*)(TypeId);
 	using GetElementTypeFn = void (*)(TypeId, TypeId*);
 	using GetTypeMethodsFn = void (*)(TypeId, ManagedHandle*, int32_t*);
 	using GetTypeFieldsFn = void (*)(TypeId, ManagedHandle*, int32_t*);
@@ -120,6 +121,7 @@ namespace Coral {
 		IsTypeAssignableToFn IsTypeAssignableToFptr = nullptr;
 		IsTypeAssignableFromFn IsTypeAssignableFromFptr = nullptr;
 		IsTypeSZArrayFn IsTypeSZArrayFptr = nullptr;
+		IsTypeArrayFn IsTypeArrayFptr = nullptr;
 		GetElementTypeFn GetElementTypeFptr = nullptr;
 		GetTypeMethodsFn GetTypeMethodsFptr = nullptr;
 		GetTypeFieldsFn GetTypeFieldsFptr = nullptr;
