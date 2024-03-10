@@ -148,7 +148,6 @@ public static class ArrayStorage
 
 		if (!s_FieldArrays.TryGetValue(arrayId, out var arrayHandle) || arrayHandle.Target != InValue)
 		{
-			Console.WriteLine("here?");
 			if (arrayHandle.IsAllocated)
 				arrayHandle.Free();
 

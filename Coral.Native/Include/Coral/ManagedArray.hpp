@@ -18,6 +18,7 @@ namespace Coral {
 
 		int32_t GetLength(int32_t InDimension);
 		int32_t GetRank() { return m_Rank; }
+		void* GetHandle() { return m_Handle; }
 
 		void* Data();
 
