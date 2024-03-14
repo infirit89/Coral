@@ -23,6 +23,7 @@ namespace Coral {
 		Bool,
 		Char,
 
+		String,
 		Pointer
 	};
 

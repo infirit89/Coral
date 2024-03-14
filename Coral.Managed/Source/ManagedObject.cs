@@ -30,6 +30,7 @@ internal enum ManagedType
 	Bool,
 	Char,
 
+	String,
 	Pointer
 };
 
@@ -227,7 +228,11 @@ internal static class ManagedObject
 				return;
 			}
 
-			var methodInfo = TryGetMethodInfo(type!, InMethodName, InParameterTypes, InParameterCount, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
+			var methodInfo = TryGetMethodInfo(type!,
+											(string?)InMethodName ?? throw new ArgumentNullException("InMethodName was null."),
+											InParameterTypes,
+											InParameterCount,
+											BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
 			var parameters = Marshalling.MarshalParameterArray(InParameters, InParameterCount, methodInfo);
 
 			if (methodInfo == null)
@@ -252,7 +257,11 @@ internal static class ManagedObject
 				return;
 			}
 
-			var methodInfo = TryGetMethodInfo(type!, InMethodName, InParameterTypes, InParameterCount, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
+			var methodInfo = TryGetMethodInfo(type!, 
+											(string?)InMethodName ?? throw new ArgumentNullException("InMethodName was null."),
+											InParameterTypes,
+											InParameterCount,
+											BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
 			var methodParameters = Marshalling.MarshalParameterArray(InParameters, InParameterCount, methodInfo);
 
 			if (methodInfo == null)
@@ -286,7 +295,11 @@ internal static class ManagedObject
 
 			var targetType = target.GetType();
 
-			var methodInfo = TryGetMethodInfo(targetType, InMethodName, InParameterTypes, InParameterCount, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+			var methodInfo = TryGetMethodInfo(targetType, 
+											(string?)InMethodName ?? throw new ArgumentNullException("InMethodName was null."),
+											InParameterTypes,
+											InParameterCount,
+											BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
 			var parameters = Marshalling.MarshalParameterArray(InParameters, InParameterCount, methodInfo);
 
 			if (methodInfo == null)
@@ -315,7 +328,11 @@ internal static class ManagedObject
 
 			var targetType = target.GetType();
 
-            var methodInfo = TryGetMethodInfo(targetType, InMethodName, InParameterTypes, InParameterCount, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+            var methodInfo = TryGetMethodInfo(targetType, 
+											(string?)InMethodName ?? throw new ArgumentNullException("InMethodName was null"), 
+											InParameterTypes,
+											InParameterCount,
+											BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
 			if (methodInfo == null)
 				return;
 
