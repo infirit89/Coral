@@ -42,6 +42,7 @@ namespace Coral {
 	using GetTypeAttributesFn = void (*)(ManagedHandle, TypeId*, int32_t*);
 	using GetTypeManagedTypeFn = ManagedType (*)(TypeId);
 	using GetTypeMethodFn = ManagedHandle (*)(TypeId, String, const ManagedType*, int32_t);
+	using GetTypeField = ManagedHandle (*)(TypeId, String);
 
 #pragma endregion
 
@@ -130,6 +131,7 @@ namespace Coral {
 		GetTypeAttributesFn GetTypeAttributesFptr = nullptr;
 		GetTypeManagedTypeFn GetTypeManagedTypeFptr = nullptr;
 		GetTypeMethodFn GetTypeMethodFptr = nullptr;
+		GetTypeField GetTypeFieldFptr = nullptr;
 
 #pragma endregion
 

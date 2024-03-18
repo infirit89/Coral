@@ -8,8 +8,8 @@ namespace Coral {
 	{
 	public:
 		ManagedArray() = default;
-		ManagedArray(void* handle, int32_t rank)
-		    : m_Handle(handle), m_Rank(rank) { }
+		ManagedArray(const void* handle, int32_t rank)
+		    : m_Handle((void*)handle), m_Rank(rank) { }
 
 		static ManagedArray New(Type& InElementType, int32_t InLength);
 		static ManagedArray New(Type& InElementType, const int32_t* InLengths, size_t InLengthsSize);

@@ -296,6 +296,7 @@ namespace Coral {
 		s_ManagedFunctions.InvokeStaticMethodFptr = LoadCoralManagedFunctionPtr<InvokeStaticMethodFn>(CORAL_STR("Coral.Managed.ManagedObject, Coral.Managed"), CORAL_STR("InvokeStaticMethod"));
 		s_ManagedFunctions.InvokeStaticMethodRetFptr = LoadCoralManagedFunctionPtr<InvokeStaticMethodRetFn>(CORAL_STR("Coral.Managed.ManagedObject, Coral.Managed"), CORAL_STR("InvokeStaticMethodRet"));
 		s_ManagedFunctions.GetTypeMethodFptr = LoadCoralManagedFunctionPtr<GetTypeMethodFn>(CORAL_STR("Coral.Managed.TypeInterface, Coral.Managed"), CORAL_STR("GetTypeMethod"));
+		s_ManagedFunctions.GetTypeFieldFptr = LoadCoralManagedFunctionPtr<GetTypeField>(CORAL_STR("Coral.Managed.TypeInterface, Coral.Managed"), CORAL_STR("GetTypeField"));
 
 #pragma endregion
 

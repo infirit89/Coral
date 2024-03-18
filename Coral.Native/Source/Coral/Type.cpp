@@ -89,6 +89,14 @@ namespace Coral {
 		return properties;
 	}
 
+	FieldInfo Type::GetField(std::string_view InFieldName) const 
+	{
+		auto fieldName = String::New(InFieldName);
+		FieldInfo field = s_ManagedFunctions.GetTypeFieldFptr(m_Id, fieldName);
+		String::Free(fieldName);
+		return field;
+	}
+
 	bool Type::HasAttribute(const Type& InAttributeType) const
 	{
 		return s_ManagedFunctions.HasTypeAttributeFptr(m_Id, InAttributeType.m_Id);

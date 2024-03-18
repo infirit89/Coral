@@ -494,6 +494,29 @@ internal static class TypeInterface
 	}
 
 	[UnmanagedCallersOnly]
+	internal static unsafe int GetTypeField(int InType, NativeString InFieldName) 
+	{
+		try
+		{
+			if (!s_CachedTypes.TryGetValue(InType, out var type))
+				return -1;
+
+			FieldInfo? field = type!.GetField((string?)InFieldName ?? throw new ArgumentNullException("InFieldName was null"), 
+											BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public);
+
+			if (field == null)
+				return -1;
+
+			return s_CachedFields.Add(field);
+		}
+		catch (Exception e) 
+		{
+			HandleException(e);
+			return -1;
+		}
+	}
+
+	[UnmanagedCallersOnly]
 	internal static unsafe void GetTypeProperties(int InType, int* InPropertyArray, int* InPropertyCount)
 	{
 		try
