@@ -6,8 +6,11 @@ using System.Collections.Immutable;
 using System.Data.Common;
 using System.Diagnostics;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Threading;
+
+//[assembly: InternalsVisibleTo("TerranScriptCore")]
 
 namespace Coral.Managed;
 
@@ -40,7 +43,7 @@ internal static class TypeInterface
 		return InType.Assembly.CreateInstance(InType.FullName ?? string.Empty, false, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance, null, InArguments!, null, null);
 	}
 
-	private static Dictionary<Type, ManagedType> s_TypeConverters = new()
+	internal static Dictionary<Type, ManagedType> s_TypeConverters = new()
 	{
 		{ typeof(sbyte), ManagedType.SByte },
 		{ typeof(byte), ManagedType.Byte },
@@ -844,6 +847,26 @@ internal static class TypeInterface
 		catch (Exception ex)
 		{
 			HandleException(ex);
+		}
+	}
+
+	[UnmanagedCallersOnly]
+	internal static unsafe Bool32 HasFieldInfoAttribute(int InFieldInfo, int InAttributeTypeId) 
+	{
+		try
+		{
+			if (!s_CachedFields.TryGetValue(InFieldInfo, out var fieldInfo))
+				return false;
+
+			if (!s_CachedTypes.TryGetValue(InAttributeTypeId, out var attributeType))
+				return false;
+
+			return fieldInfo!.GetCustomAttribute(attributeType!) != null;
+		}
+		catch (Exception ex) 
+		{
+			HandleException(ex);
+			return false;
 		}
 	}
 

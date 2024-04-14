@@ -21,6 +21,7 @@ namespace Coral {
 		TypeAccessibility GetAccessibility() const;
 
 		std::vector<Attribute> GetAttributes() const;
+		bool HasAttribute(const Type& InAttributeType) const;
 
 		ManagedHandle GetHandle() const { return m_Handle; }
 		operator ManagedHandle() const { return m_Handle; }
