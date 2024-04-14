@@ -5,13 +5,13 @@
 #include "TypeCache.hpp"
 
 namespace Coral {
-	ManagedArray ManagedArray::New(Type& InElementType, int32_t InLength)
+	ManagedArray ManagedArray::New(const Type& InElementType, int32_t InLength)
 	{
 		constexpr size_t lengthsSize = 1;
 		const int32_t lengths[lengthsSize] = { InLength };
 		return ManagedArray::New(InElementType, lengths, lengthsSize);
 	}
-	ManagedArray ManagedArray::New(Type& InElementType, const int32_t* InLengths, size_t InLengthsSize)
+	ManagedArray ManagedArray::New(const Type& InElementType, const int32_t* InLengths, size_t InLengthsSize)
 	{
 		ManagedArray array;
 		s_ManagedFunctions.CreateArrayFptr(InElementType.GetTypeId(), InLengths, InLengthsSize, &array);

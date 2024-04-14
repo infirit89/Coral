@@ -11,8 +11,8 @@ namespace Coral {
 		ManagedArray(const void* handle, int32_t rank)
 		    : m_Handle((void*)handle), m_Rank(rank) { }
 
-		static ManagedArray New(Type& InElementType, int32_t InLength);
-		static ManagedArray New(Type& InElementType, const int32_t* InLengths, size_t InLengthsSize);
+		static ManagedArray New(const Type& InElementType, int32_t InLength);
+		static ManagedArray New(const Type& InElementType, const int32_t* InLengths, size_t InLengthsSize);
 
 		void Destroy();
 
