@@ -26,9 +26,9 @@ namespace Coral {
 		String::Free(methodName);
 	}
 
-	void ManagedObject::InvokeMethodByMethodInfoInternal(const MethodInfo& InMethodInfo, const void** InParameters, size_t InLength) const
+	void ManagedObject::InvokeMethodByMethodInfoInternal(const MethodInfo& InMethodInfo, const void** InParameters, size_t InLength, bool wrapExceptions) const
 	{
-		s_ManagedFunctions.InvokeMethodByMethodInfoFptr(m_Handle, InMethodInfo.m_Handle, InParameters, InLength);
+		s_ManagedFunctions.InvokeMethodByMethodInfoFptr(m_Handle, InMethodInfo.m_Handle, InLength, InParameters, wrapExceptions);
 	}
 
 	void ManagedObject::SetFieldValueRaw(std::string_view InFieldName, void* InValue) const

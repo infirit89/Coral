@@ -73,6 +73,22 @@ namespace Coral {
 			}
 		}
 
+		template <typename... TArgs>
+		void InvokeMethodByMethodInfoWithUnwrappedExceptions(const MethodInfo& InMethodInfo, TArgs&&... InParameters) const
+		{
+			constexpr size_t parameterCount = sizeof...(InParameters);
+			if constexpr (parameterCount > 0)
+			{
+				const void* parameterValues[parameterCount];
+				AddToValueArray<TArgs...>(parameterValues, std::forward<TArgs>(InParameters)..., std::make_index_sequence<parameterCount> {});
+				InvokeMethodByMethodInfoInternal(InMethodInfo, parameterValues, parameterCount, false);
+			}
+			else
+			{
+				InvokeMethodByMethodInfoInternal(InMethodInfo, nullptr, 0, false);
+			}
+		}
+
 		template<typename TValue>
 		void SetFieldValue(std::string_view InFieldName, TValue InValue) const
 		{
@@ -133,7 +149,7 @@ namespace Coral {
 	private:
 		void InvokeMethodInternal(std::string_view InMethodName, const void** InParameters, const ManagedType* InParameterTypes, size_t InLength) const;
 		void InvokeMethodRetInternal(std::string_view InMethodName, const void** InParameters, const ManagedType* InParameterTypes, size_t InLength, void* InResultStorage) const;
-		void InvokeMethodByMethodInfoInternal(const MethodInfo& InMethodInfo, const void** InParameters, size_t InLength) const;
+		void InvokeMethodByMethodInfoInternal(const MethodInfo& InMethodInfo, const void** InParameters, size_t InLength, bool wrapExceptions = true) const;
 
 	private:
 		void* m_Handle = nullptr;

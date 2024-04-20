@@ -86,7 +86,7 @@ namespace Coral {
 	using CreateObjectFn = void* (*)(TypeId, Bool32, const void**, const ManagedType*, int32_t);
 	using InvokeMethodFn = void (*)(void*, String, const void**, const ManagedType*, int32_t);
 	using InvokeMethodRetFn = void (*)(void*, String, const void**, const ManagedType*, int32_t, void*);
-	using InvokeMethodByMethodInfoFn = void (*)(void*, ManagedHandle, const void**, int32_t);
+	using InvokeMethodByMethodInfoFn = void (*)(void*, ManagedHandle, int32_t, const void**, bool);
 	using InvokeStaticMethodFn = void (*)(TypeId, String, const void**, const ManagedType*, int32_t);
 	using InvokeStaticMethodRetFn = void (*)(TypeId, String, const void**, const ManagedType*, int32_t, void*);
 	using SetFieldValueFn = void (*)(void*, String, void*);

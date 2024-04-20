@@ -352,7 +352,7 @@ internal static class ManagedObject
 	}
 
 	[UnmanagedCallersOnly]
-	internal static unsafe void InvokeMethodByMethodInfo(IntPtr InObjectHandle, int InMethodHandle, IntPtr InParameters, int InParameterCount) 
+	internal static unsafe void InvokeMethodByMethodInfo(IntPtr InObjectHandle, int InMethodHandle, int InParameterCount, IntPtr InParameters, byte wrapExceptions) 
 	{
 		try 
 		{
@@ -372,8 +372,11 @@ internal static class ManagedObject
 
 			var methodParameters = Marshalling.MarshalParameterArray(InParameters, InParameterCount, methodInfo);
 
-			methodInfo!.Invoke(target, methodParameters);
-		}
+			if(wrapExceptions == 1)
+				methodInfo!.Invoke(target, methodParameters);
+			else
+                methodInfo!.Invoke(target, BindingFlags.DoNotWrapExceptions, null, methodParameters, null);
+        }
 		catch(Exception ex)
 		{
 			HandleException(ex);
