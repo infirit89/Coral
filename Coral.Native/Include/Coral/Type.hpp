@@ -12,6 +12,11 @@ namespace Coral {
 	class Type
 	{
 	public:
+		Type() = default;
+		Type(TypeId typeId)
+		    : m_Id(typeId) { }
+
+	public:
 		String GetFullName() const;
 		String GetAssemblyQualifiedName() const;
 
