@@ -602,6 +602,29 @@ internal static class TypeInterface
 	}
 
 	[UnmanagedCallersOnly]
+	internal static unsafe void GetTypeAttribute(int InType, int InAttributeType, int* OutAttribute) 
+	{
+		try
+		{
+			if (!s_CachedTypes.TryGetValue(InType, out var type))
+				return;
+
+            if (!s_CachedTypes.TryGetValue(InAttributeType, out var attributeType))
+                return;
+
+			Attribute? attribute = type!.GetCustomAttribute(attributeType!);
+			if (attribute == null)
+				return;
+
+			*OutAttribute = s_CachedAttributes.Add(attribute);
+        }
+        catch (Exception ex) 
+		{
+			HandleException(ex);
+		}
+	}
+
+    [UnmanagedCallersOnly]
 	internal static unsafe ManagedType GetTypeManagedType(int InType)
 	{
 		try

@@ -116,6 +116,15 @@ namespace Coral {
 		return result;
 	}
 
+	Attribute Type::GetAttribute(const Type& InAttributeType) const
+	{
+		ManagedHandle attributeHandle = -1;
+		s_ManagedFunctions.GetTypeAttributeFptr(m_Id, InAttributeType.GetTypeId(), &attributeHandle);
+		Attribute attribute;
+		attribute.m_Handle = attributeHandle;
+		return attribute;
+	}
+
 	ManagedType Type::GetManagedType() const
 	{
 		return s_ManagedFunctions.GetTypeManagedTypeFptr(m_Id);

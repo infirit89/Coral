@@ -19,7 +19,6 @@ namespace Coral {
 			return result;
 		}
 
-	private:
 		void GetFieldValueInternal(std::string_view InFieldName, void* OutValue) const;
 
 	private:
