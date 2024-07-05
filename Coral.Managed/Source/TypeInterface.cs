@@ -87,7 +87,6 @@ internal static class TypeInterface
 
 			int matchingTypes = 0;
 
-			Console.WriteLine("Param length: {0}", methodParams.Length);
 			for (int i = 0; i < methodParams.Length; i++)
 			{
 				ManagedType paramType;
@@ -100,9 +99,6 @@ internal static class TypeInterface
 				{
 					paramType = ManagedType.Unknown;
 				}
-
-				Console.WriteLine("Method param type: {0}", paramType);
-				Console.WriteLine("Expected param type: {0}", InParameterTypes[i]);
 
 				if (paramType == InParameterTypes[i])
 				{
