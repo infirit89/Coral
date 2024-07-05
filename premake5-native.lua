@@ -1,5 +1,3 @@
-premake.api.addAllowed("debuggertype", "NativeWithManagedCore")
-
 workspace "Coral"
     configurations { "Debug", "Release" }
 
@@ -15,6 +13,7 @@ workspace "Coral"
 include "Coral.Native"
 
 group "Tests"
+	include "Tests/Testing.Native/Vendor/gtest/googletest"
 	include "Tests/Testing.Native"
 group ""
 

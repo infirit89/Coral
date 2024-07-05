@@ -1,0 +1,3 @@
+[submodule "Tests/Testing.Native/Vendor/gtest"]
+	path = Tests/Testing.Native/Vendor/gtest
+	url = https://github.com/infirit89/googletest

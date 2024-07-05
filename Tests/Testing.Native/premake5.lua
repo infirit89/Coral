@@ -18,7 +18,11 @@ project "Testing.Native"
         "Source/**.hpp",
     }
 
-    externalincludedirs { "../../Coral.Native/Include/" }
+    externalincludedirs
+    {
+        "../../Coral.Native/Include/",
+        "Vendor/gtest/googletest/include"
+    }
 
 	postbuildcommands {
 		'{COPYFILE} "%{wks.location}/Coral.Managed/Coral.Managed.runtimeconfig.json" "%{cfg.targetdir}"',
@@ -26,6 +30,7 @@ project "Testing.Native"
 
 	links {
 		"Coral.Native",
+        "googletest"
 	}
 
     filter { "configurations:Debug" }

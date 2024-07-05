@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
 using System.Runtime.InteropServices;
 
 namespace Coral.Managed.Interop;
@@ -112,15 +113,92 @@ public struct NativeArray<T> : IDisposable, IEnumerable<T>
 		set => Marshal.StructureToPtr<T>(value!, IntPtr.Add(m_NativeArray, InIndex * Marshal.SizeOf<T>()), false);
 	}
 
+	public static NativeArray<T> Map(T[] array)
+	{
+		var handle = GCHandle.Alloc(array, GCHandleType.Pinned);
+		return new(handle.AddrOfPinnedObject(), array.Length);
+	}
+
 	public static implicit operator T[](NativeArray<T> InArray) => InArray.ToArray();
+	public static implicit operator NativeArray<T>(T[] InArray) => new(InArray);
 
 }
 
-[StructLayout(LayoutKind.Sequential, Pack = 1)]
+public static class ArrayStorage
+{
+	private static Dictionary<int, GCHandle> s_FieldArrays = new();
+
+	public static bool HasFieldArray(object? InTarget, MemberInfo? InArrayMemberInfo)
+	{
+		if (InArrayMemberInfo == null)
+			return false;
+
+		int arrayId = InArrayMemberInfo.GetHashCode();
+		arrayId += InTarget != null ? InTarget.GetHashCode() : 0;
+		return s_FieldArrays.ContainsKey(arrayId);
+	}
+
+	public static GCHandle? GetFieldArray(object? InTarget, object? InValue, MemberInfo? InArrayMemberInfo)
+	{
+		if (InArrayMemberInfo == null && InTarget == null)
+			return null;
+
+		int arrayId = InArrayMemberInfo != null ? InArrayMemberInfo.GetHashCode() : 0;
+		arrayId += InTarget != null ? InTarget.GetHashCode() : 0;
+
+		if (!s_FieldArrays.TryGetValue(arrayId, out var arrayHandle) || arrayHandle.Target != InValue)
+		{
+			if (arrayHandle.IsAllocated)
+				arrayHandle.Free();
+
+			var arrayObject = InValue as Array;
+			arrayHandle = GCHandle.Alloc(arrayObject, GCHandleType.Normal);
+
+			if(InTarget != null)
+				AssemblyLoader.RegisterHandle(InTarget.GetType().Assembly, arrayHandle);
+			else
+                AssemblyLoader.RegisterHandle(Assembly.GetExecutingAssembly(), arrayHandle);
+            
+            s_FieldArrays[arrayId] = arrayHandle;
+		}
+
+		return arrayHandle;
+	}
+
+	public static void FreeFieldArrayIfExists(object? InTarget, MemberInfo? InArrayMemberInfo) 
+	{
+		if (InArrayMemberInfo == null)
+			return;
+
+		int arrayId = InArrayMemberInfo.GetHashCode();
+		arrayId += InTarget != null ? InTarget.GetHashCode() : 0;
+		if (s_FieldArrays.TryGetValue(arrayId, out var handle)) 
+		{
+			try
+			{
+				if(GCHandle.ToIntPtr(handle) != IntPtr.Zero)
+					handle.Free();
+			}
+			catch (InvalidOperationException ex) 
+			{
+				ManagedHost.HandleException(ex);
+			}
+			s_FieldArrays.Remove(arrayId);
+		}
+    }
+}
+
+[StructLayout(LayoutKind.Sequential)]
 public struct NativeInstance<T>
 {
 	private readonly IntPtr m_Handle;
 	private readonly IntPtr m_Unused;
+
+	private NativeInstance(IntPtr handle)
+	{
+		m_Handle = handle;
+		m_Unused = IntPtr.Zero;
+	}
 
 	public T? Get()
 	{
@@ -133,6 +211,11 @@ public struct NativeInstance<T>
 			return default;
 		
 		return (T)handle.Target;
+	}
+
+	public static implicit operator NativeInstance<T>(T instance)
+	{
+		return new(GCHandle.ToIntPtr(GCHandle.Alloc(instance, GCHandleType.Pinned)));
 	}
 
 	public static implicit operator T?(NativeInstance<T> InInstance)

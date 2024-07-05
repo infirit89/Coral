@@ -4,22 +4,22 @@ namespace Testing.Managed
 {
 	public class VirtualMethodTests
 	{
-		public virtual void TestMe() {}
+		public virtual string TestMe() { return ""; }
 	}
 
 	public class Override1 : VirtualMethodTests
 	{
-		public override void TestMe()
+		public override string TestMe()
 		{
-			Console.WriteLine("Override1");
+			return "Override1";
 		}
 	}
 
 	public class Override2 : VirtualMethodTests
 	{
-		public override void TestMe()
+		public override string TestMe()
 		{
-			Console.WriteLine("Override2");
+			return "Override2";
 		}
 	}
 }

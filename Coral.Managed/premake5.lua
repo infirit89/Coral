@@ -5,8 +5,9 @@ project "Coral.Managed"
     dotnetframework "net8.0"
     kind "SharedLib"
 	clr "Unsafe"
-	targetdir("Build/%{cfg.buildcfg}-%{cfg.system}")
-	objdir("Intermediates/%{cfg.buildcfg}-%{cfg.system}")
+	targetdir("../Build/%{cfg.buildcfg}")
+	objdir("../Intermediates/%{cfg.buildcfg}")
+    dependson { "Coral.Generator" }
 
     -- Don't specify architecture here. (see https://github.com/premake/premake-core/issues/1758)
 

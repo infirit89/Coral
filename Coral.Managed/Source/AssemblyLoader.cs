@@ -6,6 +6,7 @@ using System.IO;
 using System.IO.MemoryMappedFiles;
 using System.Linq;
 using System.Reflection;
+using System.Reflection.Metadata;
 using System.Runtime.InteropServices;
 using System.Runtime.Loader;
 
@@ -88,7 +89,7 @@ public static class AssemblyLoader
 	}
 
 	[UnmanagedCallersOnly]
-	private static int CreateAssemblyLoadContext(NativeString InName)
+	internal static int CreateAssemblyLoadContext(NativeString InName)
 	{
 		string? name = InName;
 
@@ -109,11 +110,12 @@ public static class AssemblyLoader
 
 		int contextId = name.GetHashCode();
 		s_AssemblyContexts.Add(contextId, alc);
+
 		return contextId;
 	}
 
 	[UnmanagedCallersOnly]
-	private static void UnloadAssemblyLoadContext(int InContextId)
+	internal static void UnloadAssemblyLoadContext(int InContextId)
 	{
 		if (!s_AssemblyContexts.TryGetValue(InContextId, out var alc))
 		{
@@ -129,27 +131,23 @@ public static class AssemblyLoader
 
 		foreach (var assembly in alc.Assemblies)
 		{
-			var assemblyName = assembly.GetName();
-			int assemblyId = assemblyName.Name!.GetHashCode();
+			FreeHandlesForAssembly(assembly);
+        }
 
-			if (!s_AllocatedHandles.TryGetValue(assemblyId, out var handles))
-			{
-				continue;
-			}
+		// Free remaining handles, that aren't of types created in user loaded assemblies
+		foreach (var (id, handles) in s_AllocatedHandles)
+		{
+            foreach (var handle in handles)
+            {
+                if (!handle.IsAllocated || handle.Target == null)
+                    continue;
+                    
+                LogMessage($"Found unfreed object '{handle.Target}'. Deallocating.", MessageLevel.Warning);
+                handle.Free();
+            }
+        }
 
-			foreach (var handle in handles)
-			{
-				if (!handle.IsAllocated || handle.Target == null)
-				{
-					continue;
-				}
-
-				LogMessage($"Found unfreed object '{handle.Target}' from assembly '{assemblyName}'. Deallocating.", MessageLevel.Warning);
-				handle.Free();
-			}
-		}
-
-		ManagedObject.s_CachedMethods.Clear();
+        ManagedObject.s_CachedMethods.Clear();
 
 		TypeInterface.s_CachedTypes.Clear();
 		TypeInterface.s_CachedMethods.Clear();
@@ -161,8 +159,30 @@ public static class AssemblyLoader
 		alc.Unload();
 	}
 
+	internal static void FreeHandlesForAssembly(Assembly assembly)
+	{
+        var assemblyName = assembly.GetName();
+        int assemblyId = assemblyName.Name!.GetHashCode();
+
+        if (!s_AllocatedHandles.TryGetValue(assemblyId, out var handles))
+			return;
+
+        foreach (var handle in handles)
+        {
+            if (!handle.IsAllocated || handle.Target == null)
+            {
+                continue;
+            }
+
+            LogMessage($"Found unfreed object '{handle.Target}' from assembly '{assemblyName}'. Deallocating.", MessageLevel.Warning);
+            handle.Free();
+        }
+
+		s_AllocatedHandles.Remove(assemblyId);
+    }
+
 	[UnmanagedCallersOnly]
-	private static int LoadAssembly(int InContextId, NativeString InAssemblyFilePath)
+	internal static int LoadAssembly(int InContextId, NativeString InAssemblyFilePath)
 	{
 		try
 		{
@@ -217,10 +237,10 @@ public static class AssemblyLoader
 	}
 
 	[UnmanagedCallersOnly]
-	private static AssemblyLoadStatus GetLastLoadStatus() => s_LastLoadStatus;
+	internal static AssemblyLoadStatus GetLastLoadStatus() => s_LastLoadStatus;
 
 	[UnmanagedCallersOnly]
-	private static NativeString GetAssemblyName(int InAssemblyId)
+	internal static NativeString GetAssemblyName(int InAssemblyId)
 	{
 		if (!s_AssemblyCache.TryGetValue(InAssemblyId, out var assembly))
 		{
@@ -236,7 +256,7 @@ public static class AssemblyLoader
 	{
 		var assemblyName = InAssembly.GetName();
 		int assemblyId = assemblyName.Name!.GetHashCode();
-
+		
 		if (!s_AllocatedHandles.TryGetValue(assemblyId, out var handles))
 		{
 			s_AllocatedHandles.Add(assemblyId, new List<GCHandle>());

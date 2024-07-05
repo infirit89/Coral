@@ -12,6 +12,11 @@ namespace Coral {
 	class Type
 	{
 	public:
+		Type() = default;
+		Type(TypeId typeId)
+		    : m_Id(typeId) { }
+
+	public:
 		String GetFullName() const;
 		String GetAssemblyQualifiedName() const;
 
@@ -27,12 +32,16 @@ namespace Coral {
 		std::vector<FieldInfo> GetFields() const;
 		std::vector<PropertyInfo> GetProperties() const;
 
+		FieldInfo GetField(std::string_view InFieldName) const;
+
 		bool HasAttribute(const Type& InAttributeType) const;
 		std::vector<Attribute> GetAttributes() const;
+		Attribute GetAttribute(const Type& InAttributeType) const;
 
 		ManagedType GetManagedType() const;
 
 		bool IsSZArray() const;
+		bool IsArray() const;
 		Type& GetElementType();
 
 		bool operator==(const Type& InOther) const;
@@ -43,7 +52,7 @@ namespace Coral {
 
 	public:
 		template<typename... TArgs>
-		ManagedObject CreateInstance(TArgs&&... InArguments)
+		ManagedObject CreateInstance(TArgs&&... InArguments) const
 		{
 			constexpr size_t argumentCount = sizeof...(InArguments);
 
@@ -65,7 +74,7 @@ namespace Coral {
 		}
 
 		template <typename TReturn, typename... TArgs>
-		TReturn InvokeStaticMethod(std::string_view InMethodName, TArgs&&... InParameters)
+		TReturn InvokeStaticMethod(std::string_view InMethodName, TArgs&&... InParameters) const
 		{
 			constexpr size_t parameterCount = sizeof...(InParameters);
 
@@ -104,10 +113,40 @@ namespace Coral {
 			}
 		}
 
+		template<typename... TArgs>
+		MethodInfo GetMethod(std::string_view InMethodName) const
+		{
+			constexpr size_t parameterCount = sizeof...(TArgs);
+			MethodInfo method;
+			if constexpr (parameterCount > 0) 
+			{
+				ManagedType parameterTypes[parameterCount];
+				AddToTypeArray<TArgs...>(parameterTypes, std::make_index_sequence<parameterCount> {});
+				method = GetMethodInternal(InMethodName, parameterTypes, parameterCount);
+			}
+			else 
+			{
+				method = GetMethodInternal(InMethodName, nullptr, 0);
+			}
+
+			return method;
+		}
+
+		template<typename TReturn>
+		TReturn GetStaticFieldValue(std::string_view InFieldName)
+		{
+			TReturn result;
+			GetStaticFieldValueRaw(InFieldName, &result);
+			return result;
+		}
+
+		void GetStaticFieldValueRaw(std::string_view InFieldName, void* OutValue) const;
+
 	private:
-		ManagedObject CreateInstanceInternal(const void** InParameters, const ManagedType* InParameterTypes, size_t InLength);
+		ManagedObject CreateInstanceInternal(const void** InParameters, const ManagedType* InParameterTypes, size_t InLength) const;
 		void InvokeStaticMethodInternal(std::string_view InMethodName, const void** InParameters, const ManagedType* InParameterTypes, size_t InLength) const;
 		void InvokeStaticMethodRetInternal(std::string_view InMethodName, const void** InParameters, const ManagedType* InParameterTypes, size_t InLength, void* InResultStorage) const;
+		MethodInfo GetMethodInternal(std::string_view InMethodName, const ManagedType* InParameterTypes, size_t InLength) const;
 
 	private:
 		TypeId m_Id = -1;
@@ -122,6 +161,8 @@ namespace Coral {
 		friend class PropertyInfo;
 		friend class Attribute;
 		friend class ReflectionType;
+		friend class ManagedObject;
+		friend class ManagedArray;
 	};
 
 	class ReflectionType

@@ -4,6 +4,7 @@
 #include "String.hpp"
 #include "StringHelper.hpp"
 #include "Type.hpp"
+#include "TypeCache.hpp"
 
 namespace Coral {
 
@@ -25,6 +26,11 @@ namespace Coral {
 		String::Free(methodName);
 	}
 
+	void ManagedObject::InvokeMethodByMethodInfoInternal(const MethodInfo& InMethodInfo, const void** InParameters, size_t InLength, bool wrapExceptions) const
+	{
+		s_ManagedFunctions.InvokeMethodByMethodInfoFptr(m_Handle, InMethodInfo.m_Handle, InLength, InParameters, wrapExceptions);
+	}
+
 	void ManagedObject::SetFieldValueRaw(std::string_view InFieldName, void* InValue) const
 	{
 		auto fieldName = String::New(InFieldName);
@@ -32,11 +38,21 @@ namespace Coral {
 		String::Free(fieldName);
 	}
 
+	void ManagedObject::SetFieldValueByHandleRaw(ManagedHandle InFieldHandle, void* InValue) const
+	{
+		s_ManagedFunctions.SetFieldValueByFieldInfoFptr(m_Handle, InFieldHandle, InValue);
+	}
+
 	void ManagedObject::GetFieldValueRaw(std::string_view InFieldName, void* OutValue) const
 	{
 		auto fieldName = String::New(InFieldName);
 		s_ManagedFunctions.GetFieldValueFptr(m_Handle, fieldName, OutValue);
 		String::Free(fieldName);
+	}
+
+	void ManagedObject::GetFieldValueByHandleRaw(ManagedHandle InFieldHandle, void* OutValue) const
+	{
+		s_ManagedFunctions.GetFieldValueByFieldInfoFptr(m_Handle, InFieldHandle, OutValue);
 	}
 
 	void ManagedObject::SetPropertyValueRaw(std::string_view InPropertyName, void* InValue) const
@@ -53,8 +69,15 @@ namespace Coral {
 		String::Free(propertyName);
 	}
 
-	const Type& ManagedObject::GetType() const
+	const Type& ManagedObject::GetType()
 	{
+		if (!m_Type)
+		{
+			Type type;
+			s_ManagedFunctions.GetObjectTypeIdFptr(m_Handle, &type.m_Id);
+			m_Type = TypeCache::Get().CacheType(std::move(type));
+		}
+
 		return *m_Type;
 	}
 
@@ -67,6 +90,4 @@ namespace Coral {
 		m_Handle = nullptr;
 		m_Type = nullptr;
 	}
-
 }
-

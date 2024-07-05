@@ -48,7 +48,7 @@ namespace Coral {
 
 		auto[idx, result] = m_LoadedAssemblies.EmplaceBack();
 		result.m_Host = m_Host;
-		result.m_AssemblyID = s_ManagedFunctions.LoadManagedAssemblyFptr(m_ContextId, filepath);
+		result.m_AssemblyID = s_ManagedFunctions.LoadAssemblyFptr(m_ContextId, filepath);
 		result.m_LoadStatus = s_ManagedFunctions.GetLastLoadStatusFptr();
 
 		if (result.m_LoadStatus == AssemblyLoadStatus::Success)

@@ -1,12 +1,13 @@
 #pragma once
 
 #include "Core.hpp"
+#include "String.hpp"
 
 namespace Coral {
 
 	enum class ManagedType
 	{
-		Unknown,
+		Unknown = 0,
 
 		SByte,
 		Byte,
@@ -21,8 +22,10 @@ namespace Coral {
 		Double,
 
 		Bool,
+		Char,
 
-		Pointer,
+		String,
+		Pointer
 	};
 
 	template<typename TArg>
@@ -38,7 +41,7 @@ namespace Coral {
 			return ManagedType::UInt;
 		else if constexpr (std::same_as<TArg, uint64_t> || (std::same_as<TArg, unsigned long> && sizeof(TArg) == 8))
 			return ManagedType::ULong;
-		else if constexpr (std::same_as<TArg, char8_t>)
+		else if constexpr (std::same_as<TArg, char8_t> || std::same_as<TArg, int8_t>)
 			return ManagedType::SByte;
 		else if constexpr (std::same_as<TArg, int16_t>)
 			return ManagedType::Short;
@@ -52,6 +55,8 @@ namespace Coral {
 			return ManagedType::Double;
 		else if constexpr (std::same_as<TArg, bool>)
 			return ManagedType::Bool;
+		else if constexpr (std::same_as<TArg, Coral::String> || std::same_as<TArg, Coral::ScopedString>)
+			return ManagedType::String;
 		else
 			return ManagedType::Unknown;
 	}
@@ -59,8 +64,27 @@ namespace Coral {
 	template <typename TArg, size_t TIndex>
 	inline void AddToArrayI(const void** InArgumentsArr, ManagedType* InParameterTypes, TArg&& InArg)
 	{
-		InParameterTypes[TIndex] = GetManagedType<TArg>();
+		InParameterTypes[TIndex] = GetManagedType<std::remove_reference_t<TArg>>();
 
+		if constexpr (std::is_pointer_v<std::remove_reference_t<TArg>>)
+		{
+			InArgumentsArr[TIndex] = reinterpret_cast<const void*>(InArg);
+		}
+		else
+		{
+			InArgumentsArr[TIndex] = reinterpret_cast<const void*>(&InArg);
+		}
+	}
+
+	template<typename TArg, size_t TIndex>
+	inline void AddToTypeArrayI(ManagedType* InParameterTypes)
+	{
+		InParameterTypes[TIndex] = GetManagedType<std::remove_reference_t<TArg>>();
+	}
+
+	template<typename TArg, size_t TIndex>
+	inline void AddToValueArrayI(const void** InArgumentsArr, TArg&& InArg)
+	{
 		if constexpr (std::is_pointer_v<std::remove_reference_t<TArg>>)
 		{
 			InArgumentsArr[TIndex] = reinterpret_cast<const void*>(InArg);
@@ -77,4 +101,15 @@ namespace Coral {
 		(AddToArrayI<TArgs, TIndices>(InArgumentsArr, InParameterTypes, std::forward<TArgs>(InArgs)), ...);
 	}
 
+	template<typename... TArgs, size_t... TIndices>
+	inline void AddToTypeArray(ManagedType* InParameterTypes, const std::index_sequence<TIndices...>&)
+	{
+		(AddToTypeArrayI<TArgs, TIndices>(InParameterTypes), ...);
+	}
+
+	template<typename... TArgs, size_t... TIndices>
+	inline void AddToValueArray(const void** InArgumentsArr, TArgs&&... InArgs, const std::index_sequence<TIndices...>&)
+	{
+		(AddToValueArrayI<TArgs, TIndices>(InArgumentsArr, std::forward<TArgs>(InArgs)), ...);
+	}
 }

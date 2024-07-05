@@ -56,7 +56,7 @@ namespace Coral {
 
 		std::vector<MethodInfo> methods(handles.size());
 		for (size_t i = 0; i < handles.size(); i++)
-			methods[i].m_Handle = handles[i];
+			methods[i] = handles[i];
 
 		return methods;
 	}
@@ -70,7 +70,7 @@ namespace Coral {
 
 		std::vector<FieldInfo> fields(handles.size());
 		for (size_t i = 0; i < handles.size(); i++)
-			fields[i].m_Handle = handles[i];
+			fields[i] = handles[i];
 
 		return fields;
 	}
@@ -87,6 +87,14 @@ namespace Coral {
 			properties[i].m_Handle = handles[i];
 
 		return properties;
+	}
+
+	FieldInfo Type::GetField(std::string_view InFieldName) const 
+	{
+		auto fieldName = String::New(InFieldName);
+		FieldInfo field = s_ManagedFunctions.GetTypeFieldFptr(m_Id, fieldName);
+		String::Free(fieldName);
+		return field;
 	}
 
 	bool Type::HasAttribute(const Type& InAttributeType) const
@@ -108,6 +116,15 @@ namespace Coral {
 		return result;
 	}
 
+	Attribute Type::GetAttribute(const Type& InAttributeType) const
+	{
+		ManagedHandle attributeHandle = -1;
+		s_ManagedFunctions.GetTypeAttributeFptr(m_Id, InAttributeType.GetTypeId(), &attributeHandle);
+		Attribute attribute;
+		attribute.m_Handle = attributeHandle;
+		return attribute;
+	}
+
 	ManagedType Type::GetManagedType() const
 	{
 		return s_ManagedFunctions.GetTypeManagedTypeFptr(m_Id);
@@ -116,6 +133,11 @@ namespace Coral {
 	bool Type::IsSZArray() const
 	{
 		return s_ManagedFunctions.IsTypeSZArrayFptr(m_Id);
+	}
+
+	bool Type::IsArray() const
+	{
+		return s_ManagedFunctions.IsTypeArrayFptr(m_Id);
 	}
 
 	Type& Type::GetElementType()
@@ -135,7 +157,14 @@ namespace Coral {
 		return m_Id == InOther.m_Id;
 	}
 
-	ManagedObject Type::CreateInstanceInternal(const void** InParameters, const ManagedType* InParameterTypes, size_t InLength)
+	void Type::GetStaticFieldValueRaw(std::string_view InFieldName, void* OutValue) const
+	{
+		auto fieldName = String::New(InFieldName);
+		s_ManagedFunctions.GetStaticFieldValueFptr(m_Id, fieldName, OutValue);
+		String::Free(fieldName);
+	}
+
+	ManagedObject Type::CreateInstanceInternal(const void** InParameters, const ManagedType* InParameterTypes, size_t InLength) const
 	{
 		ManagedObject result;
 		result.m_Handle = s_ManagedFunctions.CreateObjectFptr(m_Id, false, InParameters, InParameterTypes, static_cast<int32_t>(InLength));
@@ -157,6 +186,12 @@ namespace Coral {
 		String::Free(methodName);
 	}
 
+	MethodInfo Type::GetMethodInternal(std::string_view InMethodName, const ManagedType* InParameterTypes, size_t InLength) const
+	{
+		ScopedString methodName = String::New(InMethodName);
+		MethodInfo method = s_ManagedFunctions.GetTypeMethodFptr(m_Id, methodName, InParameterTypes, InLength);
+		return method;
+	}
 
 	ReflectionType::operator Type&() const
 	{
