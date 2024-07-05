@@ -36,7 +36,7 @@ namespace Testing
 		ASSERT_LT(result->Y - newValue.Y, 0.001f);
 	}
 
-	TEST_F(ObjectMethodMarshalTest, DummyClassMethodTest) 
+	TEST_F(ObjectMethodMarshalTest, DummyClassMethodTest)
 	{
 		MethodDummyStruct value1 = { 10, 10.0f, 10 };
 		MethodDummyStruct value2 = { 20, 20.0f, 20 };

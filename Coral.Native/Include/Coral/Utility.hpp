@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Core.hpp"
+#include "String.hpp"
 
 namespace Coral {
 
@@ -54,6 +55,8 @@ namespace Coral {
 			return ManagedType::Double;
 		else if constexpr (std::same_as<TArg, bool>)
 			return ManagedType::Bool;
+		else if constexpr (std::same_as<TArg, Coral::String> || std::same_as<TArg, Coral::ScopedString>)
+			return ManagedType::String;
 		else
 			return ManagedType::Unknown;
 	}

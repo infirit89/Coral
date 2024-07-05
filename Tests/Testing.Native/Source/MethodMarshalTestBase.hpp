@@ -24,6 +24,11 @@ namespace Testing
 		MethodMarshalTestBase() 
 		{
 			auto& methodTestType = Globals::TestAssembly->GetType("Testing.Managed.MemberMethodTest");
+			for(const auto& method : methodTestType.GetMethods())
+			{
+				Coral::ScopedString methodName = method.GetName();
+				std::cout << std::string(methodName) << '\n';
+			}
 			m_MethodTestObject = methodTestType.CreateInstance();
 		}
 
