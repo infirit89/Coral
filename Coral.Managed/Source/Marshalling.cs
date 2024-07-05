@@ -48,8 +48,10 @@ public static class Marshalling
 
 	private struct ArrayObject
 	{
-		public IntPtr Handle;
-		public IntPtr Padding;
+		public ArrayObject() { }
+
+		public IntPtr Handle = IntPtr.Zero;
+		public IntPtr Padding = IntPtr.Zero;
 	}
 
 	public static object? MarshalArray(IntPtr InArray, Type? InElementType)
@@ -60,6 +62,7 @@ public static class Marshalling
 		var arrayContainer = MarshalPointer<ArrayContainer>(InArray);
 		return GCHandle.FromIntPtr(arrayContainer.Data).Target;
 
+#if false
 		// NOTE(infirit89): this if never succeeds????
 		if (ArrayStorage.HasFieldArray(null, null))
 		{
@@ -103,6 +106,7 @@ public static class Marshalling
 
 
 		return elements;
+#endif
 	}
 
 	/*public static void CopyArrayToBuffer(GCHandle InArrayHandle, Array? InArray, Type? InElementType)

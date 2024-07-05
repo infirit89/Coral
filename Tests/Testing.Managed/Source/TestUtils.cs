@@ -15,6 +15,9 @@ namespace Testing.Managed
     {
         public static void AreEqual<T>(T value1, T value2)
         {
+            if (value1 is null)
+                throw new AssertException();
+
             if (!value1.Equals(value2))
                 throw new AssertException();
         }

@@ -21,10 +21,10 @@ namespace Example.Managed {
 			public float Z;
 		}
 
-		internal static unsafe delegate*<MyVec3*, MyVec3*, void> VectorAddIcall;
-		internal static unsafe delegate*<NativeString, void> PrintStringIcall;
-		internal static unsafe delegate*<NativeArray<float>, void> NativeArrayIcall;
-		internal static unsafe delegate*<NativeArray<float>> ArrayReturnIcall;
+		internal static unsafe delegate*<MyVec3*, MyVec3*, void> VectorAddIcall = default;
+		internal static unsafe delegate*<NativeString, void> PrintStringIcall = default;
+		internal static unsafe delegate*<NativeArray<float>, void> NativeArrayIcall = default;
+		internal static unsafe delegate*<NativeArray<float>> ArrayReturnIcall = default;
 
 		private int myPrivateValue;
 

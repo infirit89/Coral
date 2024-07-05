@@ -32,7 +32,7 @@ public class PropertyMarshalTest
     public double DoublePropertyTest { get; set; } = 10.0;
     public bool BoolPropertyTest { get; set; } = false;
     public string StringPropertyTest { get; set; } = "Hello";
-    public DummyClass DummyClassPropertyTest { get; set; }
+    public DummyClass DummyClassPropertyTest { get; set; } = null!;
     public DummyStruct DummyStructPropertyTest { get; set; }
 
     public int[] IntArrayProp { get; set; } = new int[] { 6, 10, 16, 24 };

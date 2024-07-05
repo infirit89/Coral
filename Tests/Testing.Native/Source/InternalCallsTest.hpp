@@ -34,7 +34,7 @@ namespace Testing
 		Coral::ManagedArray tests = Globals::TestType.InvokeStaticMethod<Coral::ManagedArray>("CollectTests");
 
 		int32_t testCount = tests.GetLength(0);
-		for (size_t i = 0; i < testCount; i++)
+		for (int32_t i = 0; i < testCount; i++)
 		{
 			Coral::ManagedObject testObject = tests.GetValue<Coral::ManagedObject>(i);
 			

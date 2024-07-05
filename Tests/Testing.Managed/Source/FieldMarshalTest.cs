@@ -27,10 +27,10 @@ public class FieldMarshalTest
 	public double DoubleFieldTest = 10.0;
 	public bool BoolFieldTest = false;
 	public string StringFieldTest = "Hello";
-	public DummyClass DummyClassFieldTest;
+	public DummyClass DummyClassFieldTest = null!;
 	public DummyStruct DummyStructFieldTest;
 
-	public int[] IntArrayTest = new[]{ 5, 2, 1, 64 };
+	public int[] IntArrayTest = [5, 2, 1, 64];
 
 	public void ArrayParamTest(NativeArray<float> InArray)
 	{
@@ -40,7 +40,7 @@ public class FieldMarshalTest
 
 	public float[] ArrayReturnTest()
 	{
-		return new float[]{ 10.0f, 20.0f, 30.0f, 40.0f, 50.0f };
+		return [10.0f, 20.0f, 30.0f, 40.0f, 50.0f];
 	}
 
 	public void PrintIntArray() 
