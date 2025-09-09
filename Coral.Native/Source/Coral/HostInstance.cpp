@@ -159,6 +159,11 @@ namespace Coral {
 			std::filesystem::path("/usr/lib/dotnet/host/fxr/"),
 			std::filesystem::path("/usr/share/dotnet/host/fxr/"),
 		};
+#elif defined(CORAL_MACOSX)
+		auto searchPaths = std::array
+		{
+			std::filesystem::path("/usr/local/share/dotnet/host/fxr/"),
+		};
 #endif
 
 		for (const auto& path : searchPaths)
