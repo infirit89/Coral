@@ -5,6 +5,7 @@
 #include "TypeCache.hpp"
 
 #include "CoralManagedFunctions.hpp"
+#include <cstdlib>
 
 #if defined(CORAL_WINDOWS)
 	#include <ShlObj_core.h>
@@ -154,10 +155,20 @@ namespace Coral {
 		};
 
 #elif defined(CORAL_LINUX)
+
+        // the official dotnet install script on linux
+        // installs the runtime and libraries at $HOME/.dotnet
+        std::string homeDirectory = secure_getenv("HOME");
 		auto searchPaths = std::array
 		{
+			std::filesystem::path("/usr/local/lib/dotnet/host/fxr/"),
+			std::filesystem::path("/usr/local/lib64/dotnet/host/fxr/"),
+			std::filesystem::path("/usr/local/share/dotnet/host/fxr/"),
+
 			std::filesystem::path("/usr/lib/dotnet/host/fxr/"),
+			std::filesystem::path("/usr/lib64/dotnet/host/fxr/"),
 			std::filesystem::path("/usr/share/dotnet/host/fxr/"),
+			std::filesystem::path(std::string(homeDirectory + "/.dotnet")),
 		};
 #elif defined(CORAL_MACOSX)
 		auto searchPaths = std::array
